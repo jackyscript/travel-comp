@@ -67,6 +67,9 @@
           </v-list-item>
         </v-list>
 
+        <template v-else-if="searchStatus === 'pending'"
+          ><v-skeleton-loader type="table"
+        /></template>
         <p v-else-if="query">No stations found</p>
 
         <v-card v-if="selectedStation" class="mt-4">
@@ -74,7 +77,7 @@
             >Departures from {{ selectedStation.name }}</v-card-title
           >
           <v-card-text>
-            <template v-if="status === 'pending'"
+            <template v-if="departuresStatus === 'pending'"
               ><v-skeleton-loader type="card"
             /></template>
             <template v-else-if="response && response.departures.length > 0">
@@ -159,7 +162,7 @@ const query = ref("");
 const selectedStation = ref(null);
 const logoWidth = "30px";
 
-const { data: stations, refresh } = useAsyncData(
+const { data: stations, refresh, status: searchStatus } = useAsyncData(
   () => `stations-${query.value}`,
   () => {
     if (!query.value.trim()) return [];
@@ -170,7 +173,7 @@ const { data: stations, refresh } = useAsyncData(
   { default: () => [] },
 );
 
-const { data: response, status } = useAsyncData(
+const { data: response, status: departuresStatus } = useAsyncData(
   () => `departures-${selectedStation.value?.id}`,
   () => {
     if (!selectedStation.value) return [];
