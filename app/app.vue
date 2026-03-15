@@ -178,7 +178,7 @@ const { data: response, status: departuresStatus } = useAsyncData(
   () => {
     if (!selectedStation.value) return [];
     return $fetch(
-      `https://v6.vbb.transport.rest/stops/${selectedStation.value.id}/departures?results=5`,
+      `https://v6.vbb.transport.rest/stops/${selectedStation.value.id}/departures?results=5&duration=60`,
     );
   },
   { default: () => [] },
