@@ -1,6 +1,7 @@
 <template>
-  <div v-if="selectedStation" class="mt-4">
-    <h2 class="text-h5 mb-4">Departures from {{ selectedStation.name }}</h2>
+  {{ response }}
+  <div v-if="response?.departures.length > 0" class="mt-4">
+    <h2 class="text-h5 mb-4">Departures from {{ response?.departures[0]?.stop.name }}</h2>
     <div class="text-body-1 text-medium-emphasis mb-4">
       {{ formattedTime }} • {{ formattedDate }}
     </div>
@@ -72,6 +73,9 @@ interface Departure {
   direction: string
   when?: string
   delay?: number
+  stop: {
+    name: string
+  }
 }
 
 interface DeparturesResponse {

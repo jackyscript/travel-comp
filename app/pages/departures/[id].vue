@@ -12,9 +12,8 @@ const route = useRoute()
 
 const selectedStation = computed(() => {
   const id = route.params.id as string
-  const name = route.query.name as string
-  if (id && name) {
-    return { id: parseInt(id), name: decodeURIComponent(name) }
+  if (id) {
+    return { id: parseInt(id) }
   }
   return null
 })
