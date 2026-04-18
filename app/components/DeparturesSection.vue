@@ -1,4 +1,5 @@
 <template>
+  <v-btn to="/" prepend-icon="mdi-arrow-left" class="mb-2" variant="text">Go back to stations search</v-btn>
   <template v-if="departuresStatus === 'pending'">
     <v-skeleton-loader type="heading"></v-skeleton-loader>
     <v-skeleton-loader type="paragraph"></v-skeleton-loader>
