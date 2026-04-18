@@ -7,7 +7,7 @@ const iconMap: Record<ProductType, string> = {
   suburban: '/travel-comp/images/S-Bahn-Logo.svg',
   regional: '/travel-comp/images/VBB_Bahn-Regionalverkehr.svg',
   express: '/travel-comp/images/haf_prod_ic.svg',
-  ferry: '/images/Fähre-Logo-BVG.svg',
+  ferry: '/travel-comp/images/Fähre-Logo-BVG.svg',
 }
 
 export function getIconForProduct(product: string): string {
