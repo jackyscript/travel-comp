@@ -14,9 +14,9 @@
         class="mb-3 pa-3"
         elevation="2"
       >
-        <v-row align="center" no-gutters>
+        <v-row align="center" density="compact">
           <v-col cols="12" md="8">
-            <v-row align="center" no-gutters>
+            <v-row align="center" density="compact">
               <v-col cols="auto" class="mr-3">
                 <v-img
                   :src="getIconForProduct(dep.line.product)"
@@ -61,7 +61,6 @@
 </template>
 
 <script setup lang="ts">
-import { computed, ref, onMounted, onUnmounted } from 'vue'
 import { getIconForProduct } from '~/utils/transportIcons'
 
 interface Departure {

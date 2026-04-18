@@ -13,6 +13,7 @@
       <v-list-item
         v-for="station in stations"
         :key="station.id || station.name"
+        :to="`/departures/${station.id}?name=${encodeURIComponent(station.name)}`"
         @click="selectStation(station)"
       >
         <v-list-item-title>{{ station.name }}</v-list-item-title>
