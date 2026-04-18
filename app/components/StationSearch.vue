@@ -1,10 +1,12 @@
 <template>
-  <div>
+  <ClientOnly fallback-tag="div">
     <v-text-field
       v-model="query"
       label="Search station"
       placeholder="Enter station name"
       clearable
+      :loading="searchStatus === 'pending' && query"
+      :disabled="searchStatus === 'error'"
     />
 
     <v-list v-if="stations && stations.length">
@@ -59,12 +61,20 @@
     <template v-else-if="searchStatus === 'pending'">
       <v-skeleton-loader type="table"></v-skeleton-loader>
     </template>
-    <p v-else-if="query">No stations found</p>
-  </div>
+    <v-alert v-else-if="searchStatus === 'error'" type="error" class="mt-2">
+      Failed to load stations. Please try again.
+    </v-alert>
+    <p v-else-if="query" class="mt-2">No stations found</p>
+
+    <template #fallback>
+      <v-skeleton-loader type="text"></v-skeleton-loader>
+    </template>
+  </ClientOnly>
 </template>
 
 <script setup lang="ts">
 import { ref, watch } from 'vue'
+import { useDebounceFn } from '@vueuse/core'
 import { getIconForProduct } from '~/utils/transportIcons'
 
 const emit = defineEmits<{
@@ -84,6 +94,10 @@ const { data: stations, refresh, status: searchStatus } = useAsyncData(
   { default: () => [] },
 )
 
+const debouncedRefresh = useDebounceFn(() => {
+  refresh()
+}, 300)
+
 function selectStation(station: any) {
   emit('station-selected', station)
   query.value = ''
@@ -91,6 +105,6 @@ function selectStation(station: any) {
 }
 
 watch(query, () => {
-  refresh()
+  debouncedRefresh()
 })
 </script>

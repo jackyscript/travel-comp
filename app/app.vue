@@ -1,15 +1,11 @@
 <template>
   <v-app>
     <NuxtRouteAnnouncer />
-    <v-app-bar :elevation="2">
-      <template v-slot:prepend>
-        <v-app-bar-nav-icon></v-app-bar-nav-icon>
-      </template>
-
+    <v-app-bar app>
       <v-app-bar-title>Travel Comp</v-app-bar-title>
     </v-app-bar>
 
-    <v-main>
+    <v-main class="pt-16">
       <v-container>
         <StationSearch @station-selected="handleStationSelected" />
         <DeparturesSection :selected-station="selectedStation" />
