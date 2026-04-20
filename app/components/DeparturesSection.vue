@@ -179,7 +179,7 @@ const { data: response, status: departuresStatus } =
     async () => {
       if (!props.selectedStation) return { departures: [] };
       return await $fetch<DeparturesResponse>(
-        `https://v6.vbb.transport.rest/stops/${props.selectedStation.id}/departures?results=20`,
+        `https://v6.vbb.transport.rest/stops/${props.selectedStation.id}/departures?results=20&duration=100`,
       );
     },
     { default: () => ({ departures: [] }) },
