@@ -42,6 +42,19 @@
                   >{{ dep.line.name }}</v-chip
                 >
                 {{ dep.direction }}
+                <v-chip
+                  density="comfortable"
+                  size="small"
+                  label
+                  variant="flat"
+                  color="info"
+                  v-if="!!dep.platform"
+                  class="text-body-2 text-medium-emphasis ml-2"
+                >
+                  <span v-if="!dep.platform.includes('Pos')"
+                    >Pl. {{ dep.platform }}</span
+                  ><span v-else>{{ dep.platform }}</span>
+                </v-chip>
               </div>
               <div class="text-body-2 text-medium-emphasis d-md-none">
                 {{
