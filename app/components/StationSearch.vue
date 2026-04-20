@@ -7,6 +7,7 @@
       clearable
       :loading="searchStatus === 'pending' && query"
       :disabled="searchStatus === 'error'"
+      @click:clear="onClear"
     />
 
     <v-list v-if="stations && stations.length">
@@ -74,8 +75,7 @@
 </template>
 
 <script setup lang="ts">
-import { ref, watch } from 'vue'
-import { useDebounceFn } from '@vueuse/core'
+import { refDebounced } from '@vueuse/core';
 import { getIconForProduct } from '~/utils/transportIcons'
 
 const emit = defineEmits<{
@@ -83,21 +83,18 @@ const emit = defineEmits<{
 }>()
 
 const query = ref('')
+const debouncedQuery = refDebounced(query, 1000)
 
-const { data: stations, refresh, status: searchStatus } = useAsyncData(
-  () => `stations-${query.value}`,
+const { data: stations, status: searchStatus } = useAsyncData(
+  () => `stations-${debouncedQuery.value}`,
   () => {
-    if (!query.value.trim()) return []
+    if (debouncedQuery.value == null || !debouncedQuery.value.trim()) return []
     return $fetch(
-      `https://v6.vbb.transport.rest/locations?poi=false&addresses=false&query=${encodeURIComponent(query.value)}`,
+      `https://v6.vbb.transport.rest/locations?poi=false&addresses=false&query=${encodeURIComponent(debouncedQuery.value)}`,
     )
   },
-  { default: () => [] },
+  { default: () => [], watch: [debouncedQuery] },
 )
-
-const debouncedRefresh = useDebounceFn(() => {
-  refresh()
-}, 300)
 
 function selectStation(station: any) {
   emit('station-selected', station)
@@ -105,7 +102,9 @@ function selectStation(station: any) {
   stations.value = []
 }
 
-watch(query, () => {
-  debouncedRefresh()
-})
+function onClear() {
+  query.value = ''
+  stations.value = []
+}
+
 </script>
