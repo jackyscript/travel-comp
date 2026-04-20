@@ -49,7 +49,7 @@
                   variant="flat"
                   color="info"
                   v-if="!!dep.platform"
-                  class="text-body-2 text-medium-emphasis ml-2"
+                  class="text-body-2 text-medium-emphasis"
                 >
                   <span v-if="!dep.platform.includes('Pos')"
                     >Pl. {{ dep.platform }}</span
