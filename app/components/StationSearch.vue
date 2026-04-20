@@ -23,37 +23,37 @@
             <v-img
               v-if="station.products?.bus"
               :src="getIconForProduct('bus')"
-              width="30px"
+              width="24px"
             ></v-img>
             <v-img
               v-if="station.products?.tram"
               :src="getIconForProduct('tram')"
-              width="30px"
+              width="24px"
             ></v-img>
             <v-img
               v-if="station.products?.subway"
               :src="getIconForProduct('subway')"
-              width="30px"
+              width="24px"
             ></v-img>
             <v-img
               v-if="station.products?.suburban"
               :src="getIconForProduct('suburban')"
-              width="30px"
+              width="24px"
             ></v-img>
             <v-img
               v-if="station.products?.regional"
               :src="getIconForProduct('regional')"
-              width="30px"
+              width="24px"
             ></v-img>
             <v-img
               v-if="station.products?.express"
               :src="getIconForProduct('express')"
-              width="30px"
+              width="24px"
             ></v-img>
             <v-img
               v-if="station.products?.ferry"
               :src="getIconForProduct('ferry')"
-              width="30px"
+              width="24px"
             ></v-img>
           </div>
         </template>
