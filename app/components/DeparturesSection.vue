@@ -122,6 +122,7 @@ interface Departure {
   stop: {
     name: string;
   };
+  platform?: string;
 }
 
 interface DeparturesResponse {
