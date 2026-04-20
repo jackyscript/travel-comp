@@ -21,7 +21,7 @@
       <v-row align="center" density="compact">
         <v-col cols="12" md="8">
           <v-row align="center" density="compact">
-            <v-col cols="auto" class="mr-3">
+            <v-col cols="auto" class="mr-2">
               <v-img
                 :src="getIconForProduct(dep.line.product)"
                 width="40px"
@@ -30,7 +30,7 @@
             </v-col>
             <v-col>
               <div class="text-h6">
-                {{ dep.line.name }} to {{ dep.direction }}
+                 <v-chip class="mr-2" label variant="flat" :color="getColorForProduct(dep.line.product)">{{ dep.line.name }}</v-chip> {{ dep.direction }}
               </div>
               <div class="text-body-2 text-medium-emphasis d-md-none">
                 {{

@@ -10,6 +10,21 @@ const iconMap: Record<ProductType, string> = {
   ferry: '/travel-comp/images/Fähre-Logo-BVG.svg',
 }
 
+const colorMap: Record<ProductType, string> = {
+  bus: '#A5027D',
+  tram: '#D82020',
+  subway: '#004F8D',
+  suburban: '#008d4f',
+  regional: '#DA251D',
+  express: '#FFF500',
+  ferry: '#0080BA',
+}
+
 export function getIconForProduct(product: string): string {
   return iconMap[product as ProductType] || iconMap.express
 }
+
+export function getColorForProduct(product: string): string {
+  return colorMap[product as ProductType] || colorMap.express
+}
+
