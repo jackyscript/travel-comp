@@ -30,7 +30,7 @@
             </v-col>
             <v-col>
               <div class="text-h6">
-                 <v-chip class="mr-2" label variant="flat" :color="getColorForProduct(dep.line.product)">{{ dep.line.name }}</v-chip> {{ dep.direction }}
+                 <v-chip density="comfortable" size="small" class="mr-2" label variant="flat" :color="getColorForProduct(dep.line.product)">{{ dep.line.name }}</v-chip> {{ dep.direction }}
               </div>
               <div class="text-body-2 text-medium-emphasis d-md-none">
                 {{
