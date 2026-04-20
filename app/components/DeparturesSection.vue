@@ -1,5 +1,7 @@
 <template>
-  <v-btn to="/" prepend-icon="mdi-arrow-left" class="mb-2" variant="text">Go back to stations search</v-btn>
+  <v-btn to="/" prepend-icon="mdi-arrow-left" class="mb-2" variant="text"
+    >Go back to stations search</v-btn
+  >
   <template v-if="departuresStatus === 'pending'">
     <v-skeleton-loader type="heading"></v-skeleton-loader>
     <v-skeleton-loader type="paragraph"></v-skeleton-loader>
@@ -30,7 +32,16 @@
             </v-col>
             <v-col>
               <div class="text-h6">
-                 <v-chip density="comfortable" size="small" class="mr-2" label variant="flat" :color="getColorForProduct(dep.line.product)">{{ dep.line.name }}</v-chip> {{ dep.direction }}
+                <v-chip
+                  density="comfortable"
+                  size="small"
+                  class="mr-2"
+                  label
+                  variant="flat"
+                  :color="getColorForProduct(dep.line.product)"
+                  >{{ dep.line.name }}</v-chip
+                >
+                {{ dep.direction }}
               </div>
               <div class="text-body-2 text-medium-emphasis d-md-none">
                 {{
