@@ -8,6 +8,51 @@
     <v-skeleton-loader type="card"></v-skeleton-loader>
   </template>
   <template v-else-if="response?.departures.length > 0" class="mt-4">
+    <v-row v-if="availableProducts.size > 1" class="mb-4" align="center">
+      <v-col>
+        <v-btn-toggle
+          v-model="selectedProducts"
+          multiple
+          variant="flat"
+          divided
+          density="comfortable"
+        >
+          <v-btn
+            v-for="product in availableProducts"
+            :key="product"
+            :value="product"
+            :color="getColorForProduct(product)"
+            icon
+          >
+            <svg-icon
+              :path="
+                product === 'bus'
+                  ? mdiBus
+                  : product === 'tram'
+                    ? mdiTram
+                    : product === 'suburban'
+                      ? mdiTrain
+                      : product === 'subway'
+                        ? mdiSubway
+                        : mdiTrainVariant
+              "
+              type="mdi"
+            />
+          </v-btn>
+        </v-btn-toggle>
+        <v-btn
+          v-if="selectedProducts.length > 0"
+          @click="selectedProducts = []"
+          size="small"
+          class="ml-2"
+          icon
+          title="Reset filters"
+          variant="flat"
+        >
+          <v-icon>mdi-close</v-icon>
+        </v-btn>
+      </v-col>
+    </v-row>
     <h2 class="text-h5 mb-4">
       Departures from {{ response?.departures[0]?.stop.name }}
     </h2>
@@ -15,7 +60,7 @@
       {{ formattedTime }} • {{ formattedDate }}
     </div>
     <v-card
-      v-for="dep in response.departures"
+      v-for="dep in filteredDepartures"
       :key="dep.tripId"
       class="mb-3 pa-3"
       elevation="2"
@@ -108,6 +153,8 @@
 </template>
 
 <script setup lang="ts">
+import SvgIcon from "@jamescoyle/vue-icon";
+import { mdiBus, mdiSubway, mdiTrain, mdiTrainVariant, mdiTram } from "@mdi/js";
 import { getIconForProduct } from "~/utils/transportIcons";
 
 interface Departure {
@@ -184,4 +231,19 @@ const { data: response, status: departuresStatus } =
     },
     { default: () => ({ departures: [] }) },
   );
+
+const availableProducts = computed(() => {
+  const products = new Set<string>();
+  response.value.departures.forEach((dep) => products.add(dep.line.product));
+  return products;
+});
+
+const selectedProducts = ref<string[]>([]); // or ref(null) if only one can be selected
+
+const filteredDepartures = computed(() => {
+  if (selectedProducts.value.length === 0) return response.value.departures;
+  return response.value.departures.filter((dep) =>
+    selectedProducts.value.includes(dep.line.product),
+  );
+});
 </script>
