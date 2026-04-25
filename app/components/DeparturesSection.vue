@@ -34,7 +34,9 @@
                       ? mdiTrain
                       : product === 'subway'
                         ? mdiSubway
-                        : mdiTrainVariant
+                        : product === 'ferry'
+                          ? mdiFerry
+                          : mdiTrainVariant
               "
               type="mdi"
             />
@@ -154,7 +156,14 @@
 
 <script setup lang="ts">
 import SvgIcon from "@jamescoyle/vue-icon";
-import { mdiBus, mdiSubway, mdiTrain, mdiTrainVariant, mdiTram } from "@mdi/js";
+import {
+  mdiBus,
+  mdiFerry,
+  mdiSubway,
+  mdiTrain,
+  mdiTrainVariant,
+  mdiTram,
+} from "@mdi/js";
 import { getIconForProduct } from "~/utils/transportIcons";
 
 interface Departure {
