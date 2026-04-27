@@ -68,7 +68,7 @@
       elevation="2"
     >
       <v-row align="center" density="compact">
-        <v-col cols="12" md="8">
+        <v-col cols="12" sm="8">
           <v-row align="center" density="compact">
             <v-col cols="auto" class="mr-2">
               <v-img
@@ -89,21 +89,22 @@
                   >{{ dep.line.name }}</v-chip
                 >
                 {{ dep.direction }}
-                <v-chip
-                  density="comfortable"
-                  size="small"
-                  label
-                  variant="flat"
-                  color="info"
-                  v-if="!!dep.platform"
-                  class="text-body-2 text-medium-emphasis"
-                >
-                  <span v-if="!dep.platform.includes('Pos')"
-                    >Pl. {{ dep.platform }}</span
-                  ><span v-else>{{ dep.platform }}</span>
-                </v-chip>
               </div>
-              <div class="text-body-2 text-medium-emphasis d-md-none">
+
+              <v-chip
+                density="comfortable"
+                size="small"
+                label
+                variant="flat"
+                color="info"
+                v-if="!!dep.platform"
+                class="text-body-2 text-medium-emphasis"
+              >
+                <span v-if="!dep.platform.includes('Pos')"
+                  >Pl. {{ dep.platform }}</span
+                ><span v-else>{{ dep.platform }}</span>
+              </v-chip>
+              <div class="text-body-2 text-medium-emphasis d-sm-none">
                 {{
                   dep.when
                     ? Math.floor(
@@ -125,8 +126,8 @@
         </v-col>
         <v-col
           cols="12"
-          md="4"
-          class="d-none d-md-flex align-center justify-end"
+          sm="4"
+          class="d-none d-sm-flex align-center justify-end"
         >
           <div class="text-body-1 font-weight-medium text-right">
             {{
