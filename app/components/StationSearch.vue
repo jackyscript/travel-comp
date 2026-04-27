@@ -17,46 +17,45 @@
         :to="`/departures/${station.id}`"
         @click="selectStation(station)"
       >
-        <v-list-item-title>{{ station.name }}</v-list-item-title>
-        <template #append>
-          <div class="d-flex flex-wrap ga-1">
-            <v-img
-              v-if="station.products?.bus"
-              :src="getIconForProduct('bus')"
-              width="24px"
-            ></v-img>
-            <v-img
-              v-if="station.products?.tram"
-              :src="getIconForProduct('tram')"
-              width="24px"
-            ></v-img>
-            <v-img
-              v-if="station.products?.subway"
-              :src="getIconForProduct('subway')"
-              width="24px"
-            ></v-img>
-            <v-img
-              v-if="station.products?.suburban"
-              :src="getIconForProduct('suburban')"
-              width="24px"
-            ></v-img>
-            <v-img
-              v-if="station.products?.regional"
-              :src="getIconForProduct('regional')"
-              width="24px"
-            ></v-img>
-            <v-img
-              v-if="station.products?.express"
-              :src="getIconForProduct('express')"
-              width="24px"
-            ></v-img>
-            <v-img
-              v-if="station.products?.ferry"
-              :src="getIconForProduct('ferry')"
-              width="24px"
-            ></v-img>
-          </div>
-        </template>
+        <v-list-item-title class="text-pre-wrap">{{ station.name }}</v-list-item-title>
+        <div class="d-inline-flex ga-1">
+          <v-img
+            v-if="station.products?.bus"
+            :src="getIconForProduct('bus')"
+            width="24px"
+          ></v-img>
+          <v-img
+            v-if="station.products?.tram"
+            :src="getIconForProduct('tram')"
+            width="24px"
+          ></v-img>
+          <v-img
+            v-if="station.products?.subway"
+            :src="getIconForProduct('subway')"
+            width="24px"
+          ></v-img>
+          <v-img
+            v-if="station.products?.suburban"
+            :src="getIconForProduct('suburban')"
+            width="24px"
+          ></v-img>
+          <v-img
+            v-if="station.products?.regional"
+            :src="getIconForProduct('regional')"
+            width="24px"
+          ></v-img>
+          <v-img
+            v-if="station.products?.express"
+            :src="getIconForProduct('express')"
+            width="24px"
+          ></v-img>
+          <v-img
+            v-if="station.products?.ferry"
+            :src="getIconForProduct('ferry')"
+            width="24px"
+          ></v-img>
+        </div>
+      <v-divider v-if="stations.length > 1"></v-divider>
       </v-list-item>
     </v-list>
 
@@ -75,36 +74,35 @@
 </template>
 
 <script setup lang="ts">
-import { refDebounced } from '@vueuse/core';
-import { getIconForProduct } from '~/utils/transportIcons'
+import { refDebounced } from "@vueuse/core";
+import { getIconForProduct } from "~/utils/transportIcons";
 
 const emit = defineEmits<{
-  'station-selected': [station: any]
-}>()
+  "station-selected": [station: any];
+}>();
 
-const query = ref('')
-const debouncedQuery = refDebounced(query, 1000)
+const query = ref("");
+const debouncedQuery = refDebounced(query, 1000);
 
 const { data: stations, status: searchStatus } = useAsyncData(
   () => `stations-${debouncedQuery.value}`,
   () => {
-    if (debouncedQuery.value == null || !debouncedQuery.value.trim()) return []
+    if (debouncedQuery.value == null || !debouncedQuery.value.trim()) return [];
     return $fetch(
       `https://v6.vbb.transport.rest/locations?poi=false&addresses=false&query=${encodeURIComponent(debouncedQuery.value)}`,
-    )
+    );
   },
   { default: () => [], watch: [debouncedQuery] },
-)
+);
 
 function selectStation(station: any) {
-  emit('station-selected', station)
-  query.value = ''
-  stations.value = []
+  emit("station-selected", station);
+  query.value = "";
+  stations.value = [];
 }
 
 function onClear() {
-  query.value = ''
-  stations.value = []
+  query.value = "";
+  stations.value = [];
 }
-
 </script>
