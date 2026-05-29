@@ -12,8 +12,8 @@ export default defineNuxtConfig({
       link: [
         {
           rel: "icon",
-          type: "image/x-icon",
-          href: "/travel-comp/favicon.ico",
+          type: "image/svg+xml",
+          href: "/travel-comp/favicon.svg",
         },
       ],
     },
