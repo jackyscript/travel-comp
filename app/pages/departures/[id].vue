@@ -10,11 +10,37 @@ import DeparturesSection from '~/components/DeparturesSection.vue'
 
 const route = useRoute()
 
-const selectedStation = computed(() => {
+const stationId = computed(() => {
   const id = route.params.id as string
-  if (id) {
-    return { id: parseInt(id) }
+  return id ? parseInt(id) : null
+})
+
+// Fetch station details to get the name
+const { data: stationData } = useAsyncData(
+  () => `station-${stationId.value}`,
+  async () => {
+    if (!stationId.value) return null
+    try {
+      return await $fetch(`https://v6.vbb.transport.rest/stops/${stationId.value}`)
+    } catch (e) {
+      return null
+    }
+  },
+  { watch: [stationId] },
+)
+
+const selectedStation = computed(() => {
+  if (stationId.value) {
+    return { 
+      id: stationId.value,
+      name: stationData.value?.name 
+    }
   }
   return null
+})
+
+// Update page title dynamically
+useHead({
+  title: computed(() => selectedStation.value?.name || 'Travel Comp'),
 })
 </script>
