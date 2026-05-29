@@ -23,4 +23,9 @@ export default defineNuxtConfig({
     },
     baseURL: "/travel-comp/",
   },
+  nitro: {
+    prerender: {
+      ignore: ['/travel-comp/manifest.json'],
+    },
+  },
 })
