@@ -1,0 +1,17 @@
+{
+  "name": "Travel Comp",
+  "short_name": "Travel Comp",
+  "description": "Travel Comp Application",
+  "start_url": "/travel-comp/",
+  "display": "standalone",
+  "background_color": "#ffffff",
+  "theme_color": "#008d4f",
+  "icons": [
+    {
+      "src": "/travel-comp/favicon.svg",
+      "sizes": "any",
+      "type": "image/svg+xml",
+      "purpose": "any"
+    }
+  ]
+}
