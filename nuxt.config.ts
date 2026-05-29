@@ -14,11 +14,7 @@ export default defineNuxtConfig({
           rel: "icon",
           type: "image/svg+xml",
           href: "/travel-comp/favicon.svg",
-        },
-        {
-          rel: "manifest",
-          href: "/travel-comp/manifest.json",
-        },
+        }
       ],
     },
     baseURL: "/travel-comp/",
