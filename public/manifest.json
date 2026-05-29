@@ -8,12 +8,6 @@
   "theme_color": "#008d4f",
   "icons": [
     {
-      "src": "/travel-comp/favicon.svg",
-      "sizes": "any",
-      "type": "image/svg+xml",
-      "purpose": "any"
-    },
-    {
       "src": "/travel-comp/icon-192.png",
       "sizes": "192x192",
       "type": "image/png",
