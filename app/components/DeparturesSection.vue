@@ -77,7 +77,12 @@
         </v-btn>
       </v-col>
     </v-row>
-    <v-card v-for="dep in filteredDepartures" :key="dep.tripId" class="mb-3 pa-3" elevation="2">
+    <v-card
+      v-for="dep in filteredDepartures"
+      :key="dep.tripId + dep.when"
+      class="mb-3 pa-3"
+      elevation="2"
+    >
       <v-row align="center" density="compact">
         <v-col cols="12" sm="8">
           <v-row align="center" density="compact">
