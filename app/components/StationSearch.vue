@@ -1,20 +1,54 @@
 <template>
   <ClientOnly fallback-tag="div">
-    <v-text-field v-model="query" label="Search station" placeholder="Enter station name" clearable
-      :loading="searchStatus === 'pending' && query" @click:clear="onClear" />
+    <v-text-field
+      v-model="query"
+      label="Search station"
+      placeholder="Enter station name"
+      clearable
+      :loading="searchStatus === 'pending' && query"
+      @click:clear="onClear"
+    />
 
     <v-list v-if="stations && stations.length">
-      <v-list-item v-for="station in stations" :key="station.id || station.name" :to="`/departures/${station.id}`"
-        @click="selectStation(station)">
+      <v-list-item
+        v-for="station in stations"
+        :key="station.id || station.name"
+        :to="`/departures/${station.id}`"
+        @click="selectStation(station)"
+      >
         <v-list-item-title class="text-pre-wrap">{{ station.name }}</v-list-item-title>
         <div class="d-inline-flex ga-1">
           <v-img v-if="station.products?.bus" :src="getIconForProduct('bus')" width="24px"></v-img>
-          <v-img v-if="station.products?.tram" :src="getIconForProduct('tram')" width="24px"></v-img>
-          <v-img v-if="station.products?.subway" :src="getIconForProduct('subway')" width="24px"></v-img>
-          <v-img v-if="station.products?.suburban" :src="getIconForProduct('suburban')" width="24px"></v-img>
-          <v-img v-if="station.products?.regional" :src="getIconForProduct('regional')" width="24px"></v-img>
-          <v-img v-if="station.products?.express" :src="getIconForProduct('express')" width="24px"></v-img>
-          <v-img v-if="station.products?.ferry" :src="getIconForProduct('ferry')" width="24px"></v-img>
+          <v-img
+            v-if="station.products?.tram"
+            :src="getIconForProduct('tram')"
+            width="24px"
+          ></v-img>
+          <v-img
+            v-if="station.products?.subway"
+            :src="getIconForProduct('subway')"
+            width="24px"
+          ></v-img>
+          <v-img
+            v-if="station.products?.suburban"
+            :src="getIconForProduct('suburban')"
+            width="24px"
+          ></v-img>
+          <v-img
+            v-if="station.products?.regional"
+            :src="getIconForProduct('regional')"
+            width="24px"
+          ></v-img>
+          <v-img
+            v-if="station.products?.express"
+            :src="getIconForProduct('express')"
+            width="24px"
+          ></v-img>
+          <v-img
+            v-if="station.products?.ferry"
+            :src="getIconForProduct('ferry')"
+            width="24px"
+          ></v-img>
         </div>
         <v-divider v-if="stations.length > 1"></v-divider>
       </v-list-item>
@@ -25,8 +59,14 @@
     </template>
     <v-alert v-else-if="searchStatus === 'error'" type="error" class="mt-2">
       Failed to load stations. Please try again later.
-      <v-btn :active="false" @click="refresh" variant="text" prepend-icon="mdi-refresh"
-        color="on-surface">Refresh</v-btn>
+      <v-btn
+        :active="false"
+        @click="refresh"
+        variant="text"
+        prepend-icon="mdi-refresh"
+        color="on-surface"
+        >Refresh</v-btn
+      >
     </v-alert>
     <p v-else-if="query" class="mt-2">No stations found</p>
 
@@ -48,7 +88,11 @@ const query = ref("");
 const debounceTime = 1000;
 const debouncedQuery = refDebounced(query, debounceTime);
 
-const { data: stations, status: searchStatus, refresh } = useAsyncData(
+const {
+  data: stations,
+  status: searchStatus,
+  refresh,
+} = useAsyncData(
   () => `stations-${debouncedQuery.value}`,
   () => {
     if (debouncedQuery.value == null || !debouncedQuery.value.trim()) return [];
