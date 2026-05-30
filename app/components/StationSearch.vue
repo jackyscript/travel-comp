@@ -6,7 +6,6 @@
       placeholder="Enter station name"
       clearable
       :loading="searchStatus === 'pending' && query"
-      :disabled="searchStatus === 'error'"
       @click:clear="onClear"
     />
 
@@ -82,7 +81,8 @@ const emit = defineEmits<{
 }>();
 
 const query = ref("");
-const debouncedQuery = refDebounced(query, 1000);
+const debounceTime = 1000;
+const debouncedQuery = refDebounced(query, debounceTime);
 
 const { data: stations, status: searchStatus } = useAsyncData(
   () => `stations-${debouncedQuery.value}`,
@@ -92,7 +92,7 @@ const { data: stations, status: searchStatus } = useAsyncData(
       `https://v6.vbb.transport.rest/locations?poi=false&addresses=false&query=${encodeURIComponent(debouncedQuery.value)}`,
     );
   },
-  { default: () => [], watch: [debouncedQuery] },
+  { default: () => [], watch: [debouncedQuery], timeout: debounceTime + 10000 },
 );
 
 function selectStation(station: any) {
