@@ -21,7 +21,7 @@
         {{ formattedTime }} | {{
           formattedDate }} | Next update in {{ countdown }}s
       </div>
-    </div>
+    </div>  
     <v-row v-if="availableProducts.size > 1" class="mb-4" align="center">
       <v-col>
         <v-btn-toggle v-model="selectedProducts" multiple variant="flat" divided density="comfortable">
