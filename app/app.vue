@@ -37,9 +37,9 @@ import { usePreferredDark } from "@vueuse/core";
 const theme = useTheme();
 const preferredDark = usePreferredDark();
 
-theme.global.name.value = preferredDark.value ? "dark" : "light";
+theme.change(preferredDark.value ? "dark" : "light");
 
-watch(preferredDark, (isDark) => {
-  theme.global.name.value = isDark ? "dark" : "light";
-});
+function toggleTheme() {
+  theme.change(theme.global.name.value === "dark" ? "light" : "dark");
+}
 </script>
