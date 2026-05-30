@@ -17,5 +17,6 @@
     "vue": "^3.5.32",
     "vue-router": "^5.0.4",
     "vuetify-nuxt-module": "^0.19.5"
-  }
+  },
+  "packageManager": "npm@11.16.0"
 }
