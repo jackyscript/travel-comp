@@ -124,7 +124,7 @@
                 }}
                 <span
                   v-if="dep.delay && dep.delay > 0"
-                  :class="dep.delay > 60 ? 'text-error' : 'text-success'"
+                  :class="dep.delay > 300 ? 'text-error' : 'text-warning'"
                   class="ml-2"
                 >
                   +{{ Math.floor(dep.delay / 60) }} min
@@ -142,7 +142,7 @@
             }}
             <div
               v-if="dep.delay && dep.delay > 0"
-              :class="dep.delay > 60 ? 'text-error' : 'text-success'"
+              :class="dep.delay > 300 ? 'text-error' : 'text-warning'"
               class="text-caption mt-1"
             >
               +{{ Math.floor(dep.delay / 60) }} min delay
@@ -207,11 +207,12 @@ const startCountdown = () => {
   if (countdownInterval) clearInterval(countdownInterval);
   countdown.value = 60;
   countdownInterval = setInterval(() => {
+    currentTime.value = new Date();
     countdown.value--;
     if (countdown.value <= 0) {
       clearInterval(countdownInterval!);
       refresh();
-      startCountdown(); // Restart the countdown
+      startCountdown();
     }
   }, 1000);
 };
