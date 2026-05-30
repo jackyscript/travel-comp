@@ -32,10 +32,14 @@
 <script setup lang="ts">
 import SvgIcon from "@jamescoyle/vue-icon";
 import { mdiTrainBus, mdiWeatherSunny, mdiWeatherNight } from "@mdi/js";
+import { usePreferredDark } from "@vueuse/core";
 
 const theme = useTheme();
+const preferredDark = usePreferredDark();
 
-function toggleTheme() {
-  theme.global.name.value = theme.global.name.value === "dark" ? "light" : "dark";
-}
+theme.global.name.value = preferredDark.value ? "dark" : "light";
+
+watch(preferredDark, (isDark) => {
+  theme.global.name.value = isDark ? "dark" : "light";
+});
 </script>
