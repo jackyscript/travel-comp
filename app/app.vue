@@ -6,6 +6,19 @@
         <svg-icon type="mdi" :path="mdiTrainBus"></svg-icon>
       </v-btn>
       <v-app-bar-title>Travel Comp</v-app-bar-title>
+      <v-btn
+        icon
+        class="mr-4"
+        @click="toggleTheme"
+        :aria-label="
+          theme.global.name.value === 'dark' ? 'Switch to light mode' : 'Switch to dark mode'
+        "
+      >
+        <svg-icon
+          type="mdi"
+          :path="theme.global.name.value === 'dark' ? mdiWeatherSunny : mdiWeatherNight"
+        ></svg-icon>
+      </v-btn>
     </v-app-bar>
 
     <v-main class="pt-16">
@@ -18,5 +31,11 @@
 
 <script setup lang="ts">
 import SvgIcon from "@jamescoyle/vue-icon";
-import { mdiTrainBus } from "@mdi/js";
+import { mdiTrainBus, mdiWeatherSunny, mdiWeatherNight } from "@mdi/js";
+
+const theme = useTheme();
+
+function toggleTheme() {
+  theme.global.name.value = theme.global.name.value === "dark" ? "light" : "dark";
+}
 </script>
