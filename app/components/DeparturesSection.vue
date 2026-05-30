@@ -6,28 +6,21 @@
     <v-skeleton-loader type="paragraph"></v-skeleton-loader>
     <v-skeleton-loader type="card"></v-skeleton-loader>
   </template>
-  <template v-else-if="departuresStatus === 'error'">
-    <div class="d-md-flex align-center">
-      Failed to load departures. Please try again.
-      <v-btn :active="false" @click="refresh" variant="text" prepend-icon="mdi-refresh"
-        color="on-surface">Refresh</v-btn>
-    </div>
-  </template>
+  <v-alert v-else-if="departuresStatus === 'error'" type="error" class="mt-2">
+    Failed to load stations. Please try again later.
+    <v-btn :active="false" @click="refresh" variant="text" prepend-icon="mdi-refresh"
+      color="on-surface">Refresh</v-btn>
+  </v-alert>
   <template v-else-if="response?.departures.length > 0" class="mt-4">
-    <template v-if="!isInitialLoad">
-      <v-progress-linear v-if="refreshProgress > 0" :model-value="refreshProgress" height="20" color="secondary"
-        class="mb-2">
-        Refreshing in {{ remainingSeconds }} s</v-progress-linear>
-      <v-progress-linear v-else indeterminate height="20" color="secondary" class="mb-2">Refreshing
-        now...</v-progress-linear>
-    </template>
     <h2 class="text-h5 mb-4">
       {{ filteredDepartures.length }} {{ filteredDepartures.length === 1 ? "Departure" : "Departures" }} from {{
         response?.departures[0]?.stop.name }}
     </h2>
-    <div class="text-body-1 text-medium-emphasis mb-4">
-      {{ formattedTime }} • {{
-        formattedDate }}
+    <div class="d-flex align-center mb-4">
+      <div class="text-body-1 text-medium-emphasis">
+        {{ formattedTime }} | {{
+          formattedDate }} | Next update in {{ countdown }}s
+      </div>
     </div>
     <v-row v-if="availableProducts.size > 1" class="mb-4" align="center">
       <v-col>
@@ -155,41 +148,33 @@ const props = defineProps<{
 
 const stationId = computed(() => props.selectedStation?.id);
 const isInitialLoad = ref(true);
-const isRefreshing = ref(false);
-const refreshProgress = ref(0); // 0 to 100
-const refreshInterval = 60000; // 60 seconds
-
-// Computed remaining seconds (rounded down)
-const remainingSeconds = computed(() => {
-  return Math.max(0, Math.floor((refreshInterval / 1000) * (1 - refreshProgress.value / 100)));
-});
 
 const currentTime = ref(new Date());
 
-const updateCurrentTime = () => {
-  currentTime.value = new Date();
-  refresh();
-};
+const countdown = ref(60);
+let countdownInterval: number | null = null;
 
-let timeInterval: number | null = null;
-let progressInterval: number | null = null;
-
-onMounted(() => {
-  timeInterval = setInterval(updateCurrentTime, refreshInterval);
-  progressInterval = setInterval(() => {
-    if (!isRefreshing.value) {
-      refreshProgress.value = Math.min(
-        100,
-        refreshProgress.value + 100 / (refreshInterval / 1000)
-      );
+const startCountdown = () => {
+  if (countdownInterval) clearInterval(countdownInterval);
+  countdown.value = 60;
+  countdownInterval = setInterval(() => {
+    countdown.value--;
+    if (countdown.value <= 0) {
+      clearInterval(countdownInterval!);
+      refresh();
+      startCountdown(); // Restart the countdown
     }
   }, 1000);
+};
+
+onMounted(() => {
+  startCountdown();
 });
 
 onUnmounted(() => {
-  if (timeInterval) clearInterval(timeInterval);
-  if (progressInterval) clearInterval(progressInterval);
+  if (countdownInterval) clearInterval(countdownInterval);
 });
+
 
 // Format current time and date
 const formattedTime = computed(() => {
@@ -214,19 +199,10 @@ const { data: response, status: departuresStatus, refresh } =
     () => `departures-${stationId.value}`,
     async () => {
       if (!props.selectedStation) return { departures: [] };
-      isRefreshing.value = true;
-      refreshProgress.value = 0;
-      try {
-        const data = await $fetch<DeparturesResponse>(
-          `https://v6.vbb.transport.rest/stops/${props.selectedStation.id}/departures?results=20&duration=100`,
-        );
-        return data;
-      } catch (error) {
-        console.error("Failed to fetch departures:", error);
-        return { departures: [] };
-      } finally {
-        isRefreshing.value = false;
-      }
+      const data = await $fetch<DeparturesResponse>(
+        `https://v6.vbb.transport.rest/stops/${props.selectedStation.id}/departures?results=20&duration=100`,
+      );
+      return data;
     },
     { default: () => ({ departures: [] }), timeout: 10000 },
   );
