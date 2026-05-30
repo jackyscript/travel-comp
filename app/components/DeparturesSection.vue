@@ -8,8 +8,7 @@
   </template>
   <v-alert v-else-if="departuresStatus === 'error'" type="error" class="mt-2">
     Failed to load stations. Please try again later.
-    <v-btn :active="false" @click="refresh" variant="text" prepend-icon="mdi-refresh"
-      color="on-surface">Refresh</v-btn>
+    <v-btn :active="false" @click="refresh" variant="text" prepend-icon="mdi-refresh" color="on-surface">Refresh</v-btn>
   </v-alert>
   <template v-else-if="response?.departures.length > 0" class="mt-4">
     <h2 class="text-h5 mb-4">
@@ -21,7 +20,7 @@
         {{ formattedTime }} | {{
           formattedDate }} | Next update in {{ countdown }}s
       </div>
-    </div>  
+    </div>
     <v-row v-if="availableProducts.size > 1" class="mb-4" align="center">
       <v-col>
         <v-btn-toggle v-model="selectedProducts" multiple variant="flat" divided density="comfortable">
@@ -64,7 +63,7 @@
               <v-chip density="comfortable" size="small" label variant="flat" color="info" v-if="!!dep.platform"
                 class="text-body-2 text-medium-emphasis">
                 <span v-if="!dep.platform.includes('Pos')">Pl. {{ dep.platform }}</span><span v-else>{{ dep.platform
-                  }}</span>
+                }}</span>
               </v-chip>
               <div class="text-body-2 text-medium-emphasis d-sm-none">
                 {{
