@@ -30,8 +30,9 @@ app/
 ├── components/
 │   ├── StationSearch.vue    # Debounced station search (v6.vbb/ locations)
 │   └── DeparturesSection.vue# Departure board with filter, refresh, delay coloring
-└── utils/
-    └── transportIcons.ts    # Product-type → SVG icon + color map
+├── utils/
+│   ├── apiHealth.ts         # Reactive VBB API health check (UptimeRobot)
+│   └── transportIcons.ts    # Product-type → SVG icon + color map
 public/                      # SVGs, favicon, robots.txt
 ```
 
