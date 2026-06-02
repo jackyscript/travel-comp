@@ -103,7 +103,9 @@
         >Refresh</v-btn
       >
     </v-alert>
-    <p v-else-if="query" class="mt-2">No stations found</p>
+    <p v-else-if="query && searchStatus === 'success' && query === debouncedQuery" class="mt-2">
+      No stations found
+    </p>
 
     <template #fallback>
       <v-skeleton-loader type="text"></v-skeleton-loader>
