@@ -41,7 +41,7 @@ public/                      # SVGs, favicon, robots.txt
 - [ ] Run `vp check` to format (Oxfmt) and lint (Oxlint) all files.
 - [ ] Run scripts via `vp run <script>` (e.g. `vp run dev`). Key scripts: `dev`, `build`, `generate`, `preview`.
 - [ ] Build for GitHub Pages: `npm run build` (runs `nuxt build`). The CI uses `npx nuxt build --preset github_pages`.
-- [ ] Pre-commit hooks: staged files are auto-formatted/linted via `vp check --fix` (configured in `vite.config.ts`).
+- [ ] Pre-commit hooks: staged files are auto-formatted/linted via `vp check --fix` (configured in `vite.config.ts`). No need to run `vp check` manually after edits — it runs on commit.
 - [ ] If setup looks wrong, run `vp env doctor` and include its output when asking for help.
 
 ## Code Conventions
