@@ -80,76 +80,146 @@
     <v-card
       v-for="dep in filteredDepartures"
       :key="dep.tripId + dep.when"
-      class="mb-3 pa-3"
+      class="mb-3"
       elevation="2"
     >
-      <v-row align="center" density="compact">
-        <v-col cols="12" sm="8">
-          <v-row align="center" density="compact">
-            <v-col cols="auto" class="mr-2">
-              <v-img :src="getIconForProduct(dep.line.product)" width="40px" height="40px"></v-img>
-            </v-col>
-            <v-col>
-              <div class="text-h6">
-                <v-chip
-                  density="comfortable"
-                  size="small"
-                  class="mr-2"
-                  label
-                  variant="flat"
-                  :color="getColorForProduct(dep.line.product)"
-                  >{{ dep.line.name }}</v-chip
-                >
-                {{ dep.direction }}
-              </div>
+      <div class="pa-3">
+        <v-row align="center" density="compact">
+          <v-col cols="12" sm="8">
+            <v-row align="center" density="compact">
+              <v-col cols="auto" class="mr-2">
+                <v-img
+                  :src="getIconForProduct(dep.line.product)"
+                  width="40px"
+                  height="40px"
+                ></v-img>
+              </v-col>
+              <v-col>
+                <div class="text-h6">
+                  <v-chip
+                    density="comfortable"
+                    size="small"
+                    class="mr-2"
+                    label
+                    variant="flat"
+                    :color="getColorForProduct(dep.line.product)"
+                    >{{ dep.line.name }}</v-chip
+                  >
+                  {{ dep.direction }}
+                </div>
 
-              <v-chip
-                density="comfortable"
-                size="small"
-                label
-                variant="flat"
-                color="info"
-                v-if="!!dep.platform"
-                class="text-body-2 text-medium-emphasis"
-              >
-                <span v-if="!dep.platform.includes('Pos')">Pl. {{ dep.platform }}</span
-                ><span v-else>{{ dep.platform }}</span>
-              </v-chip>
-              <div class="text-body-2 text-medium-emphasis d-sm-none">
-                {{
-                  dep.when
-                    ? Math.floor((new Date(dep.when).getTime() - new Date().getTime()) / 60000) +
-                      " min"
-                    : "Time not available"
-                }}
-                <span
-                  v-if="dep.delay && dep.delay > 0"
-                  :class="dep.delay > 300 ? 'text-error' : 'text-warning'"
-                  class="ml-2"
-                >
-                  +{{ Math.floor(dep.delay / 60) }} min
-                </span>
-              </div>
-            </v-col>
-          </v-row>
-        </v-col>
-        <v-col cols="12" sm="4" class="d-none d-sm-flex align-center justify-end">
-          <div class="text-body-1 font-weight-medium text-right">
-            {{
-              dep.when
-                ? Math.floor((new Date(dep.when).getTime() - new Date().getTime()) / 60000) + " min"
-                : "Time not available"
-            }}
-            <div
+                <div class="d-flex flex-column flex-md-row ga-1 mt-1 align-start">
+                  <v-chip
+                    density="comfortable"
+                    size="small"
+                    label
+                    variant="flat"
+                    color="info"
+                    v-if="!!dep.platform"
+                    class="text-body-2 text-medium-emphasis"
+                  >
+                    <span v-if="!dep.platform.includes('Pos')">Pl. {{ dep.platform }}</span
+                    ><span v-else>{{ dep.platform }}</span>
+                  </v-chip>
+                  <v-chip
+                    v-if="getOccupancy(dep)"
+                    density="comfortable"
+                    size="small"
+                    label
+                    variant="flat"
+                    :color="getOccupancy(dep)!.color"
+                    :prepend-icon="getOccupancy(dep)!.icon"
+                  >
+                    {{ getOccupancy(dep)!.title }}
+                  </v-chip>
+                </div>
+                <div class="d-sm-none d-flex align-center ga-1 mt-1">
+                  <v-chip
+                    density="comfortable"
+                    size="small"
+                    label
+                    variant="flat"
+                    prepend-icon="mdi-clock-outline"
+                    class="text-body-2"
+                  >
+                    {{
+                      dep.when
+                        ? Math.floor(
+                            (new Date(dep.when).getTime() - new Date().getTime()) / 60000,
+                          ) + " min"
+                        : "Time not available"
+                    }}
+                  </v-chip>
+                  <v-chip
+                    v-if="dep.delay && dep.delay > 0"
+                    density="comfortable"
+                    size="small"
+                    label
+                    variant="flat"
+                    :color="dep.delay > 300 ? 'error' : 'warning'"
+                    prepend-icon="mdi-clock-alert-outline"
+                    class="text-body-2"
+                  >
+                    +{{ Math.floor(dep.delay / 60) }} min
+                  </v-chip>
+                </div>
+              </v-col>
+            </v-row>
+          </v-col>
+          <v-col cols="12" sm="4" class="d-none d-sm-flex flex-column align-end ga-1">
+            <v-chip
+              density="comfortable"
+              size="small"
+              label
+              variant="flat"
+              prepend-icon="mdi-clock-outline"
+              class="text-body-2"
+            >
+              {{
+                dep.when
+                  ? Math.floor((new Date(dep.when).getTime() - new Date().getTime()) / 60000) +
+                    " min"
+                  : "Time not available"
+              }}
+            </v-chip>
+            <v-chip
               v-if="dep.delay && dep.delay > 0"
-              :class="dep.delay > 300 ? 'text-error' : 'text-warning'"
-              class="text-caption mt-1"
+              density="comfortable"
+              size="small"
+              label
+              variant="flat"
+              :color="dep.delay > 300 ? 'error' : 'warning'"
+              prepend-icon="mdi-clock-alert-outline"
+              class="text-body-2"
             >
               +{{ Math.floor(dep.delay / 60) }} min delay
+            </v-chip>
+          </v-col>
+        </v-row>
+      </div>
+
+      <v-card-actions v-if="getDisplayableRemarks(dep).length > 0" class="pt-0">
+        <v-btn variant="text" size="small" @click="toggleExpand(dep)">
+          {{ isExpanded(dep) ? "See less" : "See more" }}
+        </v-btn>
+        <v-spacer />
+      </v-card-actions>
+
+      <v-expand-transition>
+        <div v-show="isExpanded(dep)">
+          <v-divider />
+          <div class="pa-3">
+            <div
+              v-for="(remark, i) in getDisplayableRemarks(dep)"
+              :key="i"
+              class="d-flex align-start py-1"
+            >
+              <v-icon :icon="remark.icon" size="small" class="mr-2 mt-1" />
+              <span class="text-body-2" v-html="remark.text" />
             </div>
           </div>
-        </v-col>
-      </v-row>
+        </div>
+      </v-expand-transition>
     </v-card>
   </template>
   <template v-else>
@@ -185,6 +255,11 @@ interface Departure {
     name: string;
   };
   platform?: string;
+  remarks?: Array<{
+    type: string;
+    code?: string;
+    text: string;
+  }>;
 }
 
 interface DeparturesResponse {
@@ -285,4 +360,46 @@ const filteredDepartures = computed(() => {
     selectedProducts.value.includes(dep.line.product),
   );
 });
+
+function getOccupancy(dep: Departure) {
+  const occ = dep.remarks?.find((r) => r.code?.startsWith("text.occup.loc.max"));
+  if (!occ) return null;
+  const isLow = occ.code?.endsWith("11");
+  const isMed = occ.code?.endsWith("12");
+  return {
+    icon: isLow ? "mdi-account" : isMed ? "mdi-account-multiple" : "mdi-account-group",
+    color: isLow ? "success" : isMed ? "warning" : "error",
+    title: occ.text,
+  };
+}
+
+const expandedTripId = ref<string | null>(null);
+
+function toggleExpand(dep: Departure) {
+  expandedTripId.value = expandedTripId.value === dep.tripId ? null : dep.tripId;
+}
+
+function isExpanded(dep: Departure) {
+  return expandedTripId.value === dep.tripId;
+}
+
+const displayableRemarkCodes = new Set(["WV", "gu", "hj"]);
+
+function getDisplayableRemarks(dep: Departure) {
+  const items: Array<{ icon: string; text: string }> = [];
+  for (const r of dep.remarks ?? []) {
+    if (r.type === "warning") {
+      items.push({ icon: "mdi-alert", text: r.text });
+    } else if (r.code && displayableRemarkCodes.has(r.code)) {
+      const icon =
+        r.code === "WV"
+          ? "mdi-wifi"
+          : r.code === "hj"
+            ? "mdi-information"
+            : "mdi-wheelchair-accessibility";
+      items.push({ icon, text: r.text });
+    }
+  }
+  return items;
+}
 </script>
