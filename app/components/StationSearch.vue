@@ -90,7 +90,7 @@
     </v-list>
 
     <template v-else-if="searchStatus === 'pending'">
-      <v-skeleton-loader type="table"></v-skeleton-loader>
+      <v-skeleton-loader type="list-item-avatar-two-line"></v-skeleton-loader>
     </template>
     <v-alert v-else-if="searchStatus === 'error'" type="error" class="mt-2">
       Failed to load stations. Please try again later.
@@ -108,7 +108,7 @@
     </p>
 
     <template #fallback>
-      <v-skeleton-loader type="text"></v-skeleton-loader>
+      <v-skeleton-loader type="chip, text"></v-skeleton-loader>
     </template>
   </ClientOnly>
 </template>

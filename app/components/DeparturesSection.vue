@@ -4,9 +4,7 @@
   >
   <!-- Progress bar for auto-refresh countdown -->
   <template v-if="departuresStatus === 'pending' && isInitialLoad">
-    <v-skeleton-loader type="heading"></v-skeleton-loader>
-    <v-skeleton-loader type="paragraph"></v-skeleton-loader>
-    <v-skeleton-loader type="card"></v-skeleton-loader>
+    <v-skeleton-loader type="heading, paragraph, card-avatar@5"></v-skeleton-loader>
   </template>
   <v-alert v-else-if="departuresStatus === 'error'" type="error" class="mt-2">
     Failed to load stations. Please try again later.
