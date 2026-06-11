@@ -23,10 +23,29 @@
       {{ filteredDepartures.length === 1 ? "Departure" : "Departures" }} from
       {{ response?.departures[0]?.stop.name }}
     </h2>
-    <div class="d-flex align-center mb-4">
-      <div class="text-body-1 text-medium-emphasis">
-        {{ formattedTime }} | {{ formattedDate }} | Next update in {{ countdown }}s
-      </div>
+    <div class="d-flex align-center mb-4 ga-1">
+      <span
+        class="text-body-1 text-medium-emphasis"
+        style="cursor: pointer"
+        @click="openPickerDialog"
+      >
+        <template v-if="customDepartureTime">
+          Showing departures for {{ formatCustomTime }}
+        </template>
+        <template v-else>
+          {{ formattedTime }} | {{ formattedDate }} | Next update in {{ countdown }}s
+        </template>
+      </span>
+      <v-btn
+        v-if="customDepartureTime"
+        @click="resetToNow"
+        variant="text"
+        color="primary"
+        size="small"
+        class="text-body-2"
+      >
+        Now
+      </v-btn>
     </div>
     <v-row v-if="availableProducts.size > 1" class="mb-4" align="center">
       <v-col>
@@ -140,13 +159,7 @@
                     prepend-icon="mdi-clock-outline"
                     class="text-body-2"
                   >
-                    {{
-                      dep.when
-                        ? Math.floor(
-                            (new Date(dep.when).getTime() - new Date().getTime()) / 60000,
-                          ) + " min"
-                        : "Time not available"
-                    }}
+                    {{ dep.when ? formatRelativeTime(dep.when) : "Time not available" }}
                   </v-chip>
                   <v-chip
                     v-if="dep.delay && dep.delay > 0"
@@ -173,12 +186,7 @@
               prepend-icon="mdi-clock-outline"
               class="text-body-2"
             >
-              {{
-                dep.when
-                  ? Math.floor((new Date(dep.when).getTime() - new Date().getTime()) / 60000) +
-                    " min"
-                  : "Time not available"
-              }}
+              {{ dep.when ? formatRelativeTime(dep.when) : "Time not available" }}
             </v-chip>
             <v-chip
               v-if="dep.delay && dep.delay > 0"
@@ -233,6 +241,40 @@
       >
     </div>
   </template>
+  <v-bottom-sheet v-model="dialogVisible" max-width="400" inset>
+    <v-card>
+      <v-card-text class="pb-0 pt-2">
+        <v-date-picker
+          v-model="datePickerValue"
+          :min="minDate"
+          :max="maxDate"
+          hide-header
+          hide-weekdays
+          no-month-picker
+          tile
+          :elevation="0"
+          :control-height="36"
+          control-variant="modal"
+        />
+        <v-time-picker
+          v-model="timePickerValue"
+          density="compact"
+          format="24hr"
+          hide-header
+          tile
+          variant="input"
+          :elevation="0"
+          class="mt-2"
+        />
+      </v-card-text>
+      <v-card-actions>
+        <v-btn variant="text" color="primary" @click="resetToNow"> Now </v-btn>
+        <v-spacer />
+        <v-btn variant="text" @click="dialogVisible = false">Cancel</v-btn>
+        <v-btn variant="text" color="primary" @click="applyDateTime">Apply</v-btn>
+      </v-card-actions>
+    </v-card>
+  </v-bottom-sheet>
 </template>
 
 <script setup lang="ts">
@@ -271,19 +313,123 @@ const props = defineProps<{
 const stationId = computed(() => props.selectedStation?.id);
 const isInitialLoad = ref(true);
 
+const customDepartureTime = ref<Date | null>(null);
+
 const currentTime = ref(new Date());
+
+const datePickerValue = ref<Date | null>(null);
+const timePickerValue = ref("");
+const dialogVisible = ref(false);
+
+function toHHMM(date: Date): string {
+  const h = String(date.getHours()).padStart(2, "0");
+  const m = String(date.getMinutes()).padStart(2, "0");
+  return `${h}:${m}`;
+}
+
+function toLocalDate(date: Date): Date {
+  return new Date(date.getFullYear(), date.getMonth(), date.getDate());
+}
+
+const dayMs = 86400000;
+const minDate = toLocalDate(new Date(Date.now() - 5 * dayMs));
+const maxDate = toLocalDate(new Date(Date.now() + 5 * dayMs));
+
+function formatRelativeTime(when: string): string {
+  const diffMs = new Date(when).getTime() - Date.now();
+  const isPast = diffMs < 0;
+  const totalMin = Math.floor(Math.abs(diffMs) / 60000);
+  let duration: string;
+  if (totalMin < 60) {
+    duration = `${totalMin} min`;
+  } else if (totalMin < 1440) {
+    const h = Math.floor(totalMin / 60);
+    const m = totalMin % 60;
+    duration = m > 0 ? `${h} h ${m} min` : `${h} h`;
+  } else {
+    const days = Math.floor(totalMin / 1440);
+    const rem = totalMin % 1440;
+    const h = Math.floor(rem / 60);
+    const m = rem % 60;
+    duration = `${days} d`;
+    if (h > 0) duration += ` ${h} h`;
+    if (m > 0) duration += ` ${m} min`;
+  }
+  return isPast ? `${duration} ago` : duration;
+}
+
+function toISOLocal(date: Date): string {
+  const y = date.getFullYear();
+  const m = String(date.getMonth() + 1).padStart(2, "0");
+  const d = String(date.getDate()).padStart(2, "0");
+  const h = String(date.getHours()).padStart(2, "0");
+  const min = String(date.getMinutes()).padStart(2, "0");
+  const offset = -date.getTimezoneOffset();
+  const sign = offset >= 0 ? "+" : "-";
+  const zh = String(Math.floor(Math.abs(offset) / 60)).padStart(2, "0");
+  const zm = String(Math.abs(offset) % 60).padStart(2, "0");
+  return `${y}-${m}-${d}T${h}:${min}:00${sign}${zh}:${zm}`;
+}
+
+const formatCustomTime = computed(() => {
+  if (!customDepartureTime.value) return "";
+  return customDepartureTime.value.toLocaleString("en-US", {
+    weekday: "long",
+    year: "numeric",
+    month: "long",
+    day: "numeric",
+    hour: "2-digit",
+    minute: "2-digit",
+    hour12: false,
+  });
+});
+
+const effectiveWhen = computed(() => {
+  if (!customDepartureTime.value) return undefined;
+  return toISOLocal(customDepartureTime.value);
+});
+
+function openPickerDialog() {
+  const d = customDepartureTime.value ?? new Date();
+  datePickerValue.value = toLocalDate(d);
+  timePickerValue.value = toHHMM(d);
+  dialogVisible.value = true;
+}
+
+function applyDateTime() {
+  if (!datePickerValue.value || !timePickerValue.value) return;
+  const [h, min] = timePickerValue.value.split(":").map(Number);
+  const { value: date } = datePickerValue;
+  customDepartureTime.value = new Date(date.getFullYear(), date.getMonth(), date.getDate(), h, min);
+  dialogVisible.value = false;
+  stopCountdown();
+  refresh();
+}
+
+function resetToNow() {
+  customDepartureTime.value = null;
+  dialogVisible.value = false;
+  startCountdown();
+  refresh();
+}
 
 const countdown = ref(60);
 let countdownInterval: number | null = null;
 
+const stopCountdown = () => {
+  if (countdownInterval) {
+    clearInterval(countdownInterval);
+    countdownInterval = null;
+  }
+};
+
 const startCountdown = () => {
-  if (countdownInterval) clearInterval(countdownInterval);
+  stopCountdown();
   countdown.value = 60;
   countdownInterval = setInterval(() => {
     currentTime.value = new Date();
     countdown.value--;
     if (countdown.value <= 0) {
-      clearInterval(countdownInterval!);
       refresh();
       startCountdown();
     }
@@ -291,11 +437,13 @@ const startCountdown = () => {
 };
 
 onMounted(() => {
-  startCountdown();
+  if (!customDepartureTime.value) {
+    startCountdown();
+  }
 });
 
 onUnmounted(() => {
-  if (countdownInterval) clearInterval(countdownInterval);
+  stopCountdown();
 });
 
 // Format current time and date
@@ -324,8 +472,9 @@ const {
   () => `departures-${stationId.value}`,
   async () => {
     if (!props.selectedStation) return { departures: [] };
+    const when = effectiveWhen.value;
     const data = await $fetch<DeparturesResponse>(
-      `https://v6.vbb.transport.rest/stops/${props.selectedStation.id}/departures?results=20&duration=100`,
+      `https://v6.vbb.transport.rest/stops/${props.selectedStation.id}/departures?results=20&duration=100${when ? `&when=${encodeURIComponent(when)}` : ""}`,
     );
     return data;
   },
