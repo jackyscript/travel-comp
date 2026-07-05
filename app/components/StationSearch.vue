@@ -1,7 +1,6 @@
 <template>
   <ClientOnly fallback-tag="div">
     <v-alert
-      v-if="apiStatus === 'unhealthy'"
       type="error"
       variant="tonal"
       class="mb-4"
