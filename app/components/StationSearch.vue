@@ -1,5 +1,17 @@
 <template>
   <ClientOnly fallback-tag="div">
+    <v-alert
+      v-if="apiStatus === 'unhealthy'"
+      type="error"
+      variant="tonal"
+      class="mb-4"
+      border="start"
+    >
+      <strong>API Outage:</strong> The VBB transit API (vbb-rest) is currently experiencing a complete outage.
+      All data endpoints are returning 502/503 errors. Station search, departures, and journey planning are
+      temporarily unavailable. See <a href="https://github.com/derhuerst/vbb-rest/issues/70" target="_blank">upstream issue #70</a>.
+    </v-alert>
+
     <div class="d-flex align-center mb-2">
       <v-menu location="top">
         <template #activator="{ props }">
@@ -17,7 +29,7 @@
               apiStatus === "healthy"
                 ? "Online"
                 : apiStatus === "unhealthy"
-                  ? "Offline"
+                  ? "API Outage"
                   : "Checking…"
             }}
           </v-chip>
@@ -27,7 +39,7 @@
             apiStatus === "healthy"
               ? "The station search is operational."
               : apiStatus === "unhealthy"
-                ? "The station search is currently unavailable."
+                ? "vbb-rest API is down. All transit data unavailable."
                 : "Checking API status…"
           }}
           Next check in {{ healthCountdown }}s.
@@ -100,8 +112,7 @@
         variant="text"
         prepend-icon="mdi-refresh"
         color="on-surface"
-        >Refresh</v-btn
-      >
+        >Refresh</v-btn>
     </v-alert>
     <p v-else-if="query && searchStatus === 'success' && query === debouncedQuery" class="mt-2">
       No stations found
