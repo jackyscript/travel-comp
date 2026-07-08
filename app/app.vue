@@ -23,6 +23,14 @@
 
     <v-main class="pt-16">
       <v-container>
+        <v-alert
+          type="info"
+          variant="tonal"
+          class="mb-4"
+          border="start"
+        >
+          <strong>API Update:</strong> The VBB transit API (vbb-rest) has experienced intermittent outages with 502/503 errors. Station search, departures, and journey planning may be temporarily affected. See <a href="https://github.com/derhuerst/vbb-rest/issues/70" target="_blank">upstream issue #70</a> for more details.
+        </v-alert>
         <NuxtPage />
       </v-container>
     </v-main>

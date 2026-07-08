@@ -1,14 +1,4 @@
 <template>
-  <v-alert
-      type="error"
-      variant="tonal"
-      class="mb-4"
-      border="start"
-    >
-      <strong>API Outage:</strong> The VBB transit API (vbb-rest) is currently experiencing a complete outage.
-      All data endpoints are returning 502/503 errors. Station search, departures, and journey planning are
-      temporarily unavailable. See <a href="https://github.com/derhuerst/vbb-rest/issues/70" target="_blank">upstream issue #70</a>.
-  </v-alert>
   <v-btn to="/" prepend-icon="mdi-arrow-left" class="mb-2" variant="text"
     >Go back to stations search</v-btn
   >
