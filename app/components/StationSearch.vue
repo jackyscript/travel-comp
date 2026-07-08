@@ -1,40 +1,5 @@
 <template>
   <ClientOnly fallback-tag="div">
-    <div class="d-flex align-center mb-2">
-      <v-menu location="top">
-        <template #activator="{ props }">
-          <v-chip
-            v-bind="props"
-            :prepend-icon="healthIcon"
-            :color="healthColor"
-            size="small"
-            label
-            variant="flat"
-            class="mr-2"
-            style="cursor: pointer"
-          >
-            {{
-              apiStatus === "healthy"
-                ? "Online"
-                : apiStatus === "unhealthy"
-                  ? "API Outage"
-                  : "Checking…"
-            }}
-          </v-chip>
-        </template>
-        <v-card density="compact" class="pa-2 text-body-2">
-          {{
-            apiStatus === "healthy"
-              ? "The station search is operational."
-              : apiStatus === "unhealthy"
-                ? "vbb-rest API is down. All transit data unavailable."
-                : "Checking API status…"
-          }}
-          Next check in {{ healthCountdown }}s.
-        </v-card>
-      </v-menu>
-    </div>
-
     <v-text-field
       v-model="query"
       label="Search station"
@@ -115,49 +80,10 @@
 <script setup lang="ts">
 import { refDebounced } from "@vueuse/core";
 import { getIconForProduct } from "~/utils/transportIcons";
-import { useApiHealth } from "~/utils/apiHealth";
 
 const emit = defineEmits<{
   "station-selected": [station: any];
 }>();
-
-const { status: apiStatus, checkHealth } = useApiHealth();
-const HEALTH_POLL_SECONDS = 300;
-const healthCountdown = ref(HEALTH_POLL_SECONDS);
-let healthInterval: ReturnType<typeof setInterval> | null = null;
-
-const healthIcon = computed(() =>
-  apiStatus.value === "healthy"
-    ? "mdi-check-circle"
-    : apiStatus.value === "unhealthy"
-      ? "mdi-close-circle"
-      : "mdi-help-circle",
-);
-
-const healthColor = computed(() =>
-  apiStatus.value === "healthy" ? "success" : apiStatus.value === "unhealthy" ? "error" : "warning",
-);
-
-function startHealthPolling() {
-  checkHealth();
-  healthCountdown.value = HEALTH_POLL_SECONDS;
-  if (healthInterval) clearInterval(healthInterval);
-  healthInterval = setInterval(() => {
-    healthCountdown.value--;
-    if (healthCountdown.value <= 0) {
-      checkHealth();
-      healthCountdown.value = HEALTH_POLL_SECONDS;
-    }
-  }, 1000);
-}
-
-onMounted(() => {
-  startHealthPolling();
-});
-
-onUnmounted(() => {
-  if (healthInterval) clearInterval(healthInterval);
-});
 
 const query = ref("");
 const debounceTime = 1000;
