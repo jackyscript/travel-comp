@@ -12,10 +12,6 @@ This app uses the [**v6.vbb.transport.rest**](https://v6.vbb.transport.rest/) AP
 
 See the [full API documentation](https://v6.vbb.transport.rest/) for all available endpoints and parameters.
 
-## API Health
-
-Startup status is monitored via [UptimeRobot](https://stats.uptimerobot.com/57wNLs39M). The station search page displays a chip showing **Online** / **Offline** / **Checking…** based on the monitor status, fetched from `https://stats.uptimerobot.com/api/getMonitor/57wNLs39M?m=793274559`. Status is polled every 5 minutes (matching UptimeRobot's check interval).
-
 ## Setup
 
 Make sure to install dependencies:
