@@ -1,0 +1,41 @@
+{
+  "app": {
+    "switchToLightMode": "Zum hellen Modus wechseln",
+    "switchToDarkMode": "Zum dunklen Modus wechseln",
+    "language": "Sprache"
+  },
+  "common": {
+    "refresh": "Aktualisieren",
+    "cancel": "Abbrechen",
+    "apply": "Übernehmen",
+    "now": "Jetzt"
+  },
+  "search": {
+    "label": "Station suchen",
+    "placeholder": "Stationsnamen eingeben",
+    "noResults": "Keine Stationen gefunden",
+    "loadError": "Stationen konnten nicht geladen werden. Bitte später erneut versuchen."
+  },
+  "departures": {
+    "backToSearch": "Zurück zur Stationssuche",
+    "title": "{count} Abfahrt von {stop} | {count} Abfahrten von {stop}",
+    "showingDeparturesFor": "Abfahrten für {datetime}",
+    "nextUpdateIn": "Nächste Aktualisierung in {count}s",
+    "noDepartures": "Keine Abfahrten gefunden. Du kannst es später erneut versuchen.",
+    "loadError": "Stationen konnten nicht geladen werden. Bitte später erneut versuchen.",
+    "timeNotAvailable": "Keine Zeit verfügbar",
+    "platform": "Gleis {platform}",
+    "delayShort": "+{minutes} Min.",
+    "delayLong": "+{minutes} Min. Verspätung",
+    "seeMore": "Mehr anzeigen",
+    "seeLess": "Weniger anzeigen",
+    "resetFilters": "Filter zurücksetzen",
+    "relative": {
+      "minutes": "{count} Min.",
+      "hours": "{hours} Std.",
+      "hoursMinutes": "{hours} Std. {minutes} Min.",
+      "days": "{count} T",
+      "ago": "vor {duration}"
+    }
+  }
+}
