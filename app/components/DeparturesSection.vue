@@ -1,27 +1,30 @@
 <template>
   <v-btn to="/" prepend-icon="mdi-arrow-left" class="mb-2" variant="text"
-    >Go back to stations search</v-btn
+    >{{ t("departures.backToSearch") }}</v-btn
   >
   <!-- Progress bar for auto-refresh countdown -->
   <template v-if="departuresStatus === 'pending' && isInitialLoad">
     <v-skeleton-loader type="heading, paragraph, card-avatar@5"></v-skeleton-loader>
   </template>
   <v-alert v-else-if="departuresStatus === 'error'" type="error" class="mt-2">
-    Failed to load stations. Please try again later.
+    {{ t("departures.loadError") }}
     <v-btn
       :active="false"
       @click="refresh"
       variant="text"
       prepend-icon="mdi-refresh"
       color="on-surface"
-      >Refresh</v-btn
+      >{{ t("common.refresh") }}</v-btn
     >
   </v-alert>
   <template v-else-if="response?.departures.length > 0" class="mt-4">
     <h2 class="text-h5 mb-4">
-      {{ filteredDepartures.length }}
-      {{ filteredDepartures.length === 1 ? "Departure" : "Departures" }} from
-      {{ response?.departures[0]?.stop.name }}
+      {{
+        t("departures.title", {
+          count: filteredDepartures.length,
+          stop: response?.departures[0]?.stop.name,
+        })
+      }}
     </h2>
     <div class="d-flex align-center mb-4 ga-1">
       <span
@@ -30,10 +33,11 @@
         @click="openPickerDialog"
       >
         <template v-if="customDepartureTime">
-          Showing departures for {{ formatCustomTime }}
+          {{ t("departures.showingDeparturesFor", { datetime: formatCustomTime }) }}
         </template>
         <template v-else>
-          {{ formattedTime }} | {{ formattedDate }} | Next update in {{ countdown }}s
+          {{ formattedTime }} | {{ formattedDate }} |
+          {{ t("departures.nextUpdateIn", { count: countdown }) }}
         </template>
       </span>
       <v-btn
@@ -44,7 +48,7 @@
         size="small"
         class="text-body-2"
       >
-        Now
+        {{ t("common.now") }}
       </v-btn>
     </div>
     <v-row v-if="availableProducts.size > 1" class="mb-4" align="center">
@@ -61,6 +65,11 @@
             :key="product"
             :value="product"
             :color="getColorForProduct(product)"
+            :style="
+              selectedProducts.includes(product)
+                ? { color: getProductTextColor(product) }
+                : undefined
+            "
             icon
           >
             <svg-icon
@@ -87,7 +96,7 @@
           size="small"
           class="ml-2"
           icon
-          title="Reset filters"
+          :title="t('departures.resetFilters')"
           variant="flat"
         >
           <v-icon>mdi-close</v-icon>
@@ -119,7 +128,8 @@
                     class="mr-2"
                     label
                     variant="flat"
-                    :color="getColorForProduct(dep.line.product)"
+                    :color="getLineColor(dep.line)"
+                    :style="{ color: getLineTextColor(dep.line) }"
                     >{{ dep.line.name }}</v-chip
                   >
                   {{ dep.direction }}
@@ -135,7 +145,9 @@
                     v-if="!!dep.platform"
                     class="text-body-2 text-medium-emphasis"
                   >
-                    <span v-if="!dep.platform.includes('Pos')">Pl. {{ dep.platform }}</span
+                    <span v-if="!dep.platform.includes('Pos')">{{
+                      t("departures.platform", { platform: dep.platform })
+                    }}</span
                     ><span v-else>{{ dep.platform }}</span>
                   </v-chip>
                   <v-chip
@@ -159,7 +171,7 @@
                     prepend-icon="mdi-clock-outline"
                     class="text-body-2"
                   >
-                    {{ dep.when ? formatRelativeTime(dep.when) : "Time not available" }}
+                    {{ dep.when ? formatRelativeTime(dep.when) : t("departures.timeNotAvailable") }}
                   </v-chip>
                   <v-chip
                     v-if="dep.delay && dep.delay > 0"
@@ -171,7 +183,7 @@
                     prepend-icon="mdi-clock-alert-outline"
                     class="text-body-2"
                   >
-                    +{{ Math.floor(dep.delay / 60) }} min
+                    {{ t("departures.delayShort", { minutes: Math.floor(dep.delay / 60) }) }}
                   </v-chip>
                 </div>
               </v-col>
@@ -186,7 +198,7 @@
               prepend-icon="mdi-clock-outline"
               class="text-body-2"
             >
-              {{ dep.when ? formatRelativeTime(dep.when) : "Time not available" }}
+              {{ dep.when ? formatRelativeTime(dep.when) : t("departures.timeNotAvailable") }}
             </v-chip>
             <v-chip
               v-if="dep.delay && dep.delay > 0"
@@ -198,7 +210,7 @@
               prepend-icon="mdi-clock-alert-outline"
               class="text-body-2"
             >
-              +{{ Math.floor(dep.delay / 60) }} min delay
+              {{ t("departures.delayLong", { minutes: Math.floor(dep.delay / 60) }) }}
             </v-chip>
           </v-col>
         </v-row>
@@ -206,7 +218,7 @@
 
       <v-card-actions v-if="getDisplayableRemarks(dep).length > 0" class="pt-0">
         <v-btn variant="text" size="small" @click="toggleExpand(dep)">
-          {{ isExpanded(dep) ? "See less" : "See more" }}
+          {{ isExpanded(dep) ? t("departures.seeLess") : t("departures.seeMore") }}
         </v-btn>
         <v-spacer />
       </v-card-actions>
@@ -230,14 +242,14 @@
   </template>
   <template v-else>
     <div class="d-md-flex align-center">
-      No departures found. You can try again later.
+      {{ t("departures.noDepartures") }}
       <v-btn
         :active="false"
         @click="refresh"
         variant="text"
         prepend-icon="mdi-refresh"
         color="on-surface"
-        >Refresh</v-btn
+        >{{ t("common.refresh") }}</v-btn
       >
     </div>
   </template>
@@ -268,10 +280,14 @@
         />
       </v-card-text>
       <v-card-actions>
-        <v-btn variant="text" color="primary" @click="resetToNow"> Now </v-btn>
+        <v-btn variant="text" color="primary" @click="resetToNow">
+          {{ t("common.now") }}
+        </v-btn>
         <v-spacer />
-        <v-btn variant="text" @click="dialogVisible = false">Cancel</v-btn>
-        <v-btn variant="text" color="primary" @click="applyDateTime">Apply</v-btn>
+        <v-btn variant="text" @click="dialogVisible = false">{{ t("common.cancel") }}</v-btn>
+        <v-btn variant="text" color="primary" @click="applyDateTime">
+          {{ t("common.apply") }}
+        </v-btn>
       </v-card-actions>
     </v-card>
   </v-bottom-sheet>
@@ -280,6 +296,7 @@
 <script setup lang="ts">
 import SvgIcon from "@jamescoyle/vue-icon";
 import { mdiBus, mdiFerry, mdiSubway, mdiTrain, mdiTrainVariant, mdiTram } from "@mdi/js";
+import { BLACK, WHITE, getReadableTextColor } from "~/utils/color";
 import { getIconForProduct } from "~/utils/transportIcons";
 
 interface Departure {
@@ -287,6 +304,11 @@ interface Departure {
   line: {
     name: string;
     product: string;
+    // undocumented in the API's OpenAPI spec, but returned for rail lines
+    color?: {
+      fg?: string;
+      bg?: string;
+    };
   };
   direction: string;
   when?: string;
@@ -309,6 +331,8 @@ interface DeparturesResponse {
 const props = defineProps<{
   selectedStation: any;
 }>();
+
+const { t, d, locale } = useI18n();
 
 const stationId = computed(() => props.selectedStation?.id);
 const isInitialLoad = ref(true);
@@ -341,21 +365,24 @@ function formatRelativeTime(when: string): string {
   const totalMin = Math.floor(Math.abs(diffMs) / 60000);
   let duration: string;
   if (totalMin < 60) {
-    duration = `${totalMin} min`;
+    duration = t("departures.relative.minutes", totalMin);
   } else if (totalMin < 1440) {
     const h = Math.floor(totalMin / 60);
     const m = totalMin % 60;
-    duration = m > 0 ? `${h} h ${m} min` : `${h} h`;
+    duration =
+      m > 0
+        ? t("departures.relative.hoursMinutes", { hours: h, minutes: m })
+        : t("departures.relative.hours", { hours: h });
   } else {
     const days = Math.floor(totalMin / 1440);
     const rem = totalMin % 1440;
     const h = Math.floor(rem / 60);
     const m = rem % 60;
-    duration = `${days} d`;
-    if (h > 0) duration += ` ${h} h`;
-    if (m > 0) duration += ` ${m} min`;
+    duration = t("departures.relative.days", days);
+    if (h > 0) duration += ` ${t("departures.relative.hours", { hours: h })}`;
+    if (m > 0) duration += ` ${t("departures.relative.minutes", m)}`;
   }
-  return isPast ? `${duration} ago` : duration;
+  return isPast ? t("departures.relative.ago", { duration }) : duration;
 }
 
 function toISOLocal(date: Date): string {
@@ -373,15 +400,7 @@ function toISOLocal(date: Date): string {
 
 const formatCustomTime = computed(() => {
   if (!customDepartureTime.value) return "";
-  return customDepartureTime.value.toLocaleString("en-US", {
-    weekday: "long",
-    year: "numeric",
-    month: "long",
-    day: "numeric",
-    hour: "2-digit",
-    minute: "2-digit",
-    hour12: false,
-  });
+  return d(customDepartureTime.value, "long");
 });
 
 const effectiveWhen = computed(() => {
@@ -448,20 +467,11 @@ onUnmounted(() => {
 
 // Format current time and date
 const formattedTime = computed(() => {
-  return currentTime.value.toLocaleTimeString("en-US", {
-    hour: "2-digit",
-    minute: "2-digit",
-    hour12: false,
-  });
+  return d(currentTime.value, "time");
 });
 
 const formattedDate = computed(() => {
-  return currentTime.value.toLocaleDateString("en-US", {
-    weekday: "long",
-    year: "numeric",
-    month: "long",
-    day: "numeric",
-  });
+  return d(currentTime.value, "date");
 });
 
 const {
@@ -469,12 +479,14 @@ const {
   status: departuresStatus,
   refresh,
 } = useAsyncData<DeparturesResponse>(
-  () => `departures-${stationId.value}`,
+  // keyed on the locale so switching language re-fetches, since the API
+  // localises remark texts via `language`
+  () => `departures-${stationId.value}-${locale.value}`,
   async () => {
     if (!props.selectedStation) return { departures: [] };
     const when = effectiveWhen.value;
     const data = await $fetch<DeparturesResponse>(
-      `https://v6.vbb.transport.rest/stops/${props.selectedStation.id}/departures?results=20&duration=100${when ? `&when=${encodeURIComponent(when)}` : ""}`,
+      `https://v6.vbb.transport.rest/stops/${props.selectedStation.id}/departures?results=20&duration=100&language=${locale.value}${when ? `&when=${encodeURIComponent(when)}` : ""}`,
     );
     return data;
   },
@@ -508,6 +520,34 @@ const filteredDepartures = computed(() => {
   );
 });
 
+// Only S-Bahn and U-Bahn lines carry meaningful official colours. The API's
+// regional colours are inconsistent (RB10 lime, RE1 red, RE4 magenta, RE7 green)
+// and buses/express trains omit them entirely, so those keep the product palette.
+const apiColorProducts = new Set(["suburban", "subway"]);
+
+function getLineColor(line: Departure["line"]): string {
+  if (apiColorProducts.has(line.product) && line.color?.bg) {
+    return line.color.bg;
+  }
+  return getColorForProduct(line.product);
+}
+
+// U4 is the one line whose official foreground is black rather than white.
+// Fernverkehr's bright yellow is the one background white cannot be read on, so
+// it gets a measured contrast colour instead.
+const blackTextLines = new Set(["U4"]);
+
+function getLineTextColor(line: Departure["line"]): string {
+  if (line.product === "express") {
+    return getReadableTextColor(getLineColor(line));
+  }
+  return blackTextLines.has(line.name) ? BLACK : WHITE;
+}
+
+function getProductTextColor(product: string): string {
+  return product === "express" ? getReadableTextColor(getColorForProduct(product)) : WHITE;
+}
+
 function getOccupancy(dep: Departure) {
   const occ = dep.remarks?.find((r) => r.code?.startsWith("text.occup.loc.max"));
   if (!occ) return null;
@@ -516,6 +556,7 @@ function getOccupancy(dep: Departure) {
   return {
     icon: isLow ? "mdi-account" : isMed ? "mdi-account-multiple" : "mdi-account-group",
     color: isLow ? "success" : isMed ? "warning" : "error",
+    // localised by the API via the `language` request parameter
     title: occ.text,
   };
 }
