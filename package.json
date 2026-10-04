@@ -7,8 +7,7 @@
     "dev": "nuxt dev",
     "generate": "nuxt generate",
     "preview": "nuxt preview",
-    "postinstall": "nuxt prepare",
-    "prepare": "vp config --no-agent"
+    "postinstall": "nuxt prepare"
   },
   "dependencies": {
     "@jamescoyle/vue-icon": "^0.1.2",
@@ -18,12 +17,6 @@
     "vue": "^3.5.32",
     "vue-router": "^5.0.4",
     "vuetify-nuxt-module": "^1.0.0-rc.2"
-  },
-  "devDependencies": {
-    "vite-plus": "1.0.0-rc.0"
-  },
-  "overrides": {
-    "vite": "npm:@voidzero-dev/vite-plus-core@1.0.0-rc.0"
   },
   "packageManager": "npm@11.16.0"
 }
