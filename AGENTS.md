@@ -1,10 +1,4 @@
-<!--VITE PLUS START-->
-
-# Using Vite+, the Unified Toolchain for the Web
-
-This project uses **Vite+** (unified toolchain built on Vite, Rolldown, Oxlint, Oxfmt, Vite Task). Wrapped via the `vp` CLI. Run `vp help` to list commands.
-
-Docs: `node_modules/vite-plus/docs` or https://viteplus.dev/guide/
+# Travel Comp — Agent Guide
 
 ## Project Overview
 
@@ -15,7 +9,7 @@ Docs: `node_modules/vite-plus/docs` or https://viteplus.dev/guide/
 - **Framework:** Nuxt 4 (SSR) + Vue 3 + vue-router 5
 - **UI:** Vuetify 3 via `vuetify-nuxt-module`, `@jamescoyle/vue-icon`, `@mdi/js`
 - **Data:** `@vueuse/core` (debounced refs), `v6.vbb.transport.rest` API
-- **Tooling:** Vite+ (`vp`) → Oxlint (type-aware + type-check), Oxfmt, Vite Task
+- **Tooling:** plain Nuxt CLI + Vite (no extra toolchain)
 - **Package manager:** npm 11.16.0 (Node 24.x — see `.node-version`; CI uses Node 20)
 - **CI/CD:** GitHub Actions (`deploy.yml` — push to `main` or `workflow_dispatch`)
 
@@ -38,12 +32,10 @@ public/                      # SVGs, favicon, robots.txt
 
 ## Review Checklist
 
-- [ ] Run `vp install` after pulling remote changes and before getting started (equivalent to `npm install`).
-- [ ] Run `vp check` to format (Oxfmt) and lint (Oxlint) all files.
-- [ ] Run scripts via `vp run <script>` (e.g. `vp run dev`). Key scripts: `dev`, `build`, `generate`, `preview`.
+- [ ] Run `npm install` after pulling remote changes and before getting started.
+- [ ] Run scripts via `npm run <script>`. Key scripts: `dev`, `build`, `generate`, `preview`.
 - [ ] Build for GitHub Pages: `npm run build` (runs `nuxt build`). The CI uses `npx nuxt build --preset github_pages`.
-- [ ] Pre-commit hooks: staged files are auto-formatted/linted via `vp check --fix` (configured in `vite.config.ts`). No need to run `vp check` manually after edits — it runs on commit.
-- [ ] If setup looks wrong, run `vp env doctor` and include its output when asking for help.
+- [ ] No formatter/linter or pre-commit hooks are configured — match surrounding style by hand.
 
 ## Code Conventions
 
@@ -55,5 +47,3 @@ public/                      # SVGs, favicon, robots.txt
 - **Routing:** Nuxt file-based routing under `app/pages/`. Dynamic params via `useRoute().params`.
 - **No tests** — no test framework is configured.
 - **No composables directory** — put reusable logic in `app/utils/` or inline.
-
-<!--VITE PLUS END-->

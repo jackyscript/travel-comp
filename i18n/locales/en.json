@@ -1,0 +1,41 @@
+{
+  "app": {
+    "switchToLightMode": "Switch to light mode",
+    "switchToDarkMode": "Switch to dark mode",
+    "language": "Language"
+  },
+  "common": {
+    "refresh": "Refresh",
+    "cancel": "Cancel",
+    "apply": "Apply",
+    "now": "Now"
+  },
+  "search": {
+    "label": "Search station",
+    "placeholder": "Enter station name",
+    "noResults": "No stations found",
+    "loadError": "Failed to load stations. Please try again later."
+  },
+  "departures": {
+    "backToSearch": "Go back to stations search",
+    "title": "{count} departure from {stop} | {count} departures from {stop}",
+    "showingDeparturesFor": "Showing departures for {datetime}",
+    "nextUpdateIn": "Next update in {count}s",
+    "noDepartures": "No departures found. You can try again later.",
+    "loadError": "Failed to load stations. Please try again later.",
+    "timeNotAvailable": "Time not available",
+    "platform": "Pl. {platform}",
+    "delayShort": "+{minutes} min",
+    "delayLong": "+{minutes} min delay",
+    "seeMore": "See more",
+    "seeLess": "See less",
+    "resetFilters": "Reset filters",
+    "relative": {
+      "minutes": "{count} min",
+      "hours": "{hours} h",
+      "hoursMinutes": "{hours} h {minutes} min",
+      "days": "{count} d",
+      "ago": "{duration} ago"
+    }
+  }
+}

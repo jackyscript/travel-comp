@@ -2,8 +2,8 @@
   <ClientOnly fallback-tag="div">
     <v-text-field
       v-model="query"
-      label="Search station"
-      placeholder="Enter station name"
+      :label="t('search.label')"
+      :placeholder="t('search.placeholder')"
       clearable
       :loading="searchStatus === 'pending' && query"
       @click:clear="onClear"
@@ -58,17 +58,17 @@
       <v-skeleton-loader type="list-item-avatar-two-line"></v-skeleton-loader>
     </template>
     <v-alert v-else-if="searchStatus === 'error'" type="error" class="mt-2">
-      Failed to load stations. Please try again later.
+      {{ t("search.loadError") }}
       <v-btn
         :active="false"
         @click="refresh"
         variant="text"
         prepend-icon="mdi-refresh"
         color="on-surface"
-        >Refresh</v-btn>
+        >{{ t("common.refresh") }}</v-btn>
     </v-alert>
     <p v-else-if="query && searchStatus === 'success' && query === debouncedQuery" class="mt-2">
-      No stations found
+      {{ t("search.noResults") }}
     </p>
 
     <template #fallback>
@@ -80,6 +80,8 @@
 <script setup lang="ts">
 import { refDebounced } from "@vueuse/core";
 import { getIconForProduct } from "~/utils/transportIcons";
+
+const { t } = useI18n();
 
 const emit = defineEmits<{
   "station-selected": [station: any];

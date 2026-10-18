@@ -6,12 +6,37 @@
         <svg-icon type="mdi" :path="mdiTrainBus"></svg-icon>
       </v-btn>
       <v-app-bar-title>Travel Comp</v-app-bar-title>
+      <v-menu>
+        <template #activator="{ props: activatorProps }">
+          <v-btn
+            v-bind="activatorProps"
+            class="mr-1"
+            variant="text"
+            append-icon="mdi-chevron-down"
+            :aria-label="t('app.language')"
+          >
+            {{ currentLocaleName }}
+          </v-btn>
+        </template>
+        <v-list density="compact">
+          <v-list-item
+            v-for="availableLocale in locales"
+            :key="availableLocale.code"
+            :active="availableLocale.code === locale"
+            @click="setLocale(availableLocale.code)"
+          >
+            <v-list-item-title>{{ availableLocale.name }}</v-list-item-title>
+          </v-list-item>
+        </v-list>
+      </v-menu>
       <v-btn
         icon
         class="mr-4"
         @click="toggleTheme"
         :aria-label="
-          theme.global.name.value === 'dark' ? 'Switch to light mode' : 'Switch to dark mode'
+          theme.global.name.value === 'dark'
+            ? t('app.switchToLightMode')
+            : t('app.switchToDarkMode')
         "
       >
         <svg-icon
@@ -36,6 +61,16 @@ import { usePreferredDark } from "@vueuse/core";
 
 const theme = useTheme();
 const preferredDark = usePreferredDark();
+
+const { t, locale, locales, setLocale } = useI18n();
+
+const currentLocaleName = computed(
+  () => locales.value.find((l) => l.code === locale.value)?.name ?? locale.value,
+);
+
+// Keeps `<html lang>` in sync. `seo` is off because every locale shares the same
+// URL under the `no_prefix` strategy, so hreflang alternates would be duplicates.
+useLocaleHead({ lang: true, dir: false, seo: false });
 
 theme.change(preferredDark.value ? "dark" : "light");
 
