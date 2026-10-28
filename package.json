@@ -11,13 +11,13 @@
   },
   "dependencies": {
     "@jamescoyle/vue-icon": "^0.1.2",
-    "@mdi/js": "^7.5.55",
+    "@mdi/js": "^7.4.47",
     "@nuxtjs/i18n": "^10.6.0",
-    "@vueuse/core": "^15.1.0",
+    "@vueuse/core": "^14.2.1",
     "nuxt": "^4.5.2",
     "vue": "^3.5.32",
     "vue-router": "^5.0.4",
-    "vuetify-nuxt-module": "^1.0.0"
+    "vuetify-nuxt-module": "^1.0.0-rc.2"
   },
   "packageManager": "npm@11.16.0"
 }
