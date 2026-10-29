@@ -19,5 +19,8 @@
     "vue-router": "^5.0.4",
     "vuetify-nuxt-module": "^1.0.0-rc.2"
   },
-  "packageManager": "npm@11.16.0"
+  "packageManager": "npm@11.16.0",
+  "devDependencies": {
+    "vite": "^8.3.5"
+  }
 }

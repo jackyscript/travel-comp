@@ -10,7 +10,7 @@
 - **UI:** Vuetify 3 via `vuetify-nuxt-module`, `@jamescoyle/vue-icon`, `@mdi/js`
 - **Data:** `@vueuse/core` (debounced refs), `v6.vbb.transport.rest` API
 - **Tooling:** plain Nuxt CLI + Vite (no extra toolchain)
-- **Package manager:** npm 11.16.0 (Node 24.x — see `.node-version`; CI uses Node 20)
+- **Package manager:** npm 11.16.0 (Node 26.x — see `.node-version`; CI uses Node 26)
 - **CI/CD:** GitHub Actions (`deploy.yml` — push to `main` or `workflow_dispatch`)
 
 ## Project Structure
