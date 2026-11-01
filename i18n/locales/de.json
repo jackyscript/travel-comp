@@ -53,7 +53,6 @@
     "startPlaceholder": "Startstation eingeben",
     "destinationPlaceholder": "Zielstation eingeben",
     "swap": "Start und Ziel tauschen",
-    "prompt": "Wähle Start und Ziel aus, um Verbindungen zu sehen.",
     "sameStation": "Start und Ziel müssen unterschiedliche Stationen sein.",
     "title": "{count} Verbindung von {from} nach {to} | {count} Verbindungen von {from} nach {to}",
     "showingConnectionsFor": "Verbindungen für {datetime}",
