@@ -54,3 +54,31 @@ export function getReadableTextColor(background: string): string {
     ? BLACK
     : WHITE;
 }
+
+// Only S-Bahn and U-Bahn lines carry meaningful official colours. The API's
+// regional colours are inconsistent (RB10 lime, RE1 red, RE4 magenta, RE7 green)
+// and buses/express trains omit them entirely, so those keep the product palette.
+const apiColorProducts = new Set(["suburban", "subway"]);
+
+export function getLineColor(line: Line): string {
+  if (apiColorProducts.has(line.product) && line.color?.bg) {
+    return line.color.bg;
+  }
+  return getColorForProduct(line.product);
+}
+
+// U4 is the one line whose official foreground is black rather than white.
+// Fernverkehr's bright yellow is the one background white cannot be read on, so
+// it gets a measured contrast colour instead.
+const blackTextLines = new Set(["U4"]);
+
+export function getLineTextColor(line: Line): string {
+  if (line.product === "express") {
+    return getReadableTextColor(getLineColor(line));
+  }
+  return blackTextLines.has(line.name) ? BLACK : WHITE;
+}
+
+export function getProductTextColor(product: string): string {
+  return product === "express" ? getReadableTextColor(getColorForProduct(product)) : WHITE;
+}

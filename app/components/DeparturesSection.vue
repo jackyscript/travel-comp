@@ -26,31 +26,11 @@
         })
       }}
     </h2>
-    <div class="d-flex align-center mb-4 ga-1">
-      <span
-        class="text-body-1 text-medium-emphasis"
-        style="cursor: pointer"
-        @click="openPickerDialog"
-      >
-        <template v-if="customDepartureTime">
-          {{ t("departures.showingDeparturesFor", { datetime: formatCustomTime }) }}
-        </template>
-        <template v-else>
-          {{ formattedTime }} | {{ formattedDate }} |
-          {{ t("departures.nextUpdateIn", { count: countdown }) }}
-        </template>
-      </span>
-      <v-btn
-        v-if="customDepartureTime"
-        @click="resetToNow"
-        variant="text"
-        color="primary"
-        size="small"
-        class="text-body-2"
-      >
-        {{ t("common.now") }}
-      </v-btn>
-    </div>
+    <TimeControl
+      v-model="customDepartureTime"
+      :custom-label="customTimeLabel"
+      @refresh="refresh"
+    />
     <v-row v-if="availableProducts.size > 1" class="mb-4" align="center">
       <v-col>
         <v-btn-toggle
@@ -253,51 +233,13 @@
       >
     </div>
   </template>
-  <v-bottom-sheet v-model="dialogVisible" max-width="400" inset>
-    <v-card>
-      <v-card-text class="pb-0 pt-2">
-        <v-date-picker
-          v-model="datePickerValue"
-          :min="minDate"
-          :max="maxDate"
-          hide-header
-          hide-weekdays
-          no-month-picker
-          tile
-          :elevation="0"
-          :control-height="36"
-          control-variant="modal"
-        />
-        <v-time-picker
-          v-model="timePickerValue"
-          density="compact"
-          format="24hr"
-          hide-header
-          tile
-          variant="input"
-          :elevation="0"
-          class="mt-2"
-        />
-      </v-card-text>
-      <v-card-actions>
-        <v-btn variant="text" color="primary" @click="resetToNow">
-          {{ t("common.now") }}
-        </v-btn>
-        <v-spacer />
-        <v-btn variant="text" @click="dialogVisible = false">{{ t("common.cancel") }}</v-btn>
-        <v-btn variant="text" color="primary" @click="applyDateTime">
-          {{ t("common.apply") }}
-        </v-btn>
-      </v-card-actions>
-    </v-card>
-  </v-bottom-sheet>
 </template>
 
 <script setup lang="ts">
 import SvgIcon from "@jamescoyle/vue-icon";
 import { mdiBus, mdiFerry, mdiSubway, mdiTrain, mdiTrainVariant, mdiTram } from "@mdi/js";
-import { BLACK, WHITE, getReadableTextColor } from "~/utils/color";
 import { getIconForProduct } from "~/utils/transportIcons";
+import { toISOLocal } from "~/utils/time";
 
 interface Departure {
   tripId: string;
@@ -339,139 +281,16 @@ const isInitialLoad = ref(true);
 
 const customDepartureTime = ref<Date | null>(null);
 
-const currentTime = ref(new Date());
-
-const datePickerValue = ref<Date | null>(null);
-const timePickerValue = ref("");
-const dialogVisible = ref(false);
-
-function toHHMM(date: Date): string {
-  const h = String(date.getHours()).padStart(2, "0");
-  const m = String(date.getMinutes()).padStart(2, "0");
-  return `${h}:${m}`;
-}
-
-function toLocalDate(date: Date): Date {
-  return new Date(date.getFullYear(), date.getMonth(), date.getDate());
-}
-
-const dayMs = 86400000;
-const minDate = toLocalDate(new Date(Date.now() - 5 * dayMs));
-const maxDate = toLocalDate(new Date(Date.now() + 5 * dayMs));
-
-function formatRelativeTime(when: string): string {
-  const diffMs = new Date(when).getTime() - Date.now();
-  const isPast = diffMs < 0;
-  const totalMin = Math.floor(Math.abs(diffMs) / 60000);
-  let duration: string;
-  if (totalMin < 60) {
-    duration = t("departures.relative.minutes", totalMin);
-  } else if (totalMin < 1440) {
-    const h = Math.floor(totalMin / 60);
-    const m = totalMin % 60;
-    duration =
-      m > 0
-        ? t("departures.relative.hoursMinutes", { hours: h, minutes: m })
-        : t("departures.relative.hours", { hours: h });
-  } else {
-    const days = Math.floor(totalMin / 1440);
-    const rem = totalMin % 1440;
-    const h = Math.floor(rem / 60);
-    const m = rem % 60;
-    duration = t("departures.relative.days", days);
-    if (h > 0) duration += ` ${t("departures.relative.hours", { hours: h })}`;
-    if (m > 0) duration += ` ${t("departures.relative.minutes", m)}`;
-  }
-  return isPast ? t("departures.relative.ago", { duration }) : duration;
-}
-
-function toISOLocal(date: Date): string {
-  const y = date.getFullYear();
-  const m = String(date.getMonth() + 1).padStart(2, "0");
-  const d = String(date.getDate()).padStart(2, "0");
-  const h = String(date.getHours()).padStart(2, "0");
-  const min = String(date.getMinutes()).padStart(2, "0");
-  const offset = -date.getTimezoneOffset();
-  const sign = offset >= 0 ? "+" : "-";
-  const zh = String(Math.floor(Math.abs(offset) / 60)).padStart(2, "0");
-  const zm = String(Math.abs(offset) % 60).padStart(2, "0");
-  return `${y}-${m}-${d}T${h}:${min}:00${sign}${zh}:${zm}`;
-}
-
-const formatCustomTime = computed(() => {
+const customTimeLabel = computed(() => {
   if (!customDepartureTime.value) return "";
-  return d(customDepartureTime.value, "long");
+  return t("departures.showingDeparturesFor", {
+    datetime: d(customDepartureTime.value, "long"),
+  });
 });
 
 const effectiveWhen = computed(() => {
   if (!customDepartureTime.value) return undefined;
   return toISOLocal(customDepartureTime.value);
-});
-
-function openPickerDialog() {
-  const d = customDepartureTime.value ?? new Date();
-  datePickerValue.value = toLocalDate(d);
-  timePickerValue.value = toHHMM(d);
-  dialogVisible.value = true;
-}
-
-function applyDateTime() {
-  if (!datePickerValue.value || !timePickerValue.value) return;
-  const [h, min] = timePickerValue.value.split(":").map(Number);
-  const { value: date } = datePickerValue;
-  customDepartureTime.value = new Date(date.getFullYear(), date.getMonth(), date.getDate(), h, min);
-  dialogVisible.value = false;
-  stopCountdown();
-  refresh();
-}
-
-function resetToNow() {
-  customDepartureTime.value = null;
-  dialogVisible.value = false;
-  startCountdown();
-  refresh();
-}
-
-const countdown = ref(60);
-let countdownInterval: number | null = null;
-
-const stopCountdown = () => {
-  if (countdownInterval) {
-    clearInterval(countdownInterval);
-    countdownInterval = null;
-  }
-};
-
-const startCountdown = () => {
-  stopCountdown();
-  countdown.value = 60;
-  countdownInterval = setInterval(() => {
-    currentTime.value = new Date();
-    countdown.value--;
-    if (countdown.value <= 0) {
-      refresh();
-      startCountdown();
-    }
-  }, 1000);
-};
-
-onMounted(() => {
-  if (!customDepartureTime.value) {
-    startCountdown();
-  }
-});
-
-onUnmounted(() => {
-  stopCountdown();
-});
-
-// Format current time and date
-const formattedTime = computed(() => {
-  return d(currentTime.value, "time");
-});
-
-const formattedDate = computed(() => {
-  return d(currentTime.value, "date");
 });
 
 const {
@@ -492,6 +311,10 @@ const {
   },
   { default: () => ({ departures: [] }), timeout: 10000 },
 );
+
+// Refresh whenever the selected time changes (the countdown calls `refresh`
+// directly through the time control).
+watch(customDepartureTime, () => refresh());
 
 // After the first data fetch, set isInitialLoad to false
 watch(
@@ -519,34 +342,6 @@ const filteredDepartures = computed(() => {
     selectedProducts.value.includes(dep.line.product),
   );
 });
-
-// Only S-Bahn and U-Bahn lines carry meaningful official colours. The API's
-// regional colours are inconsistent (RB10 lime, RE1 red, RE4 magenta, RE7 green)
-// and buses/express trains omit them entirely, so those keep the product palette.
-const apiColorProducts = new Set(["suburban", "subway"]);
-
-function getLineColor(line: Departure["line"]): string {
-  if (apiColorProducts.has(line.product) && line.color?.bg) {
-    return line.color.bg;
-  }
-  return getColorForProduct(line.product);
-}
-
-// U4 is the one line whose official foreground is black rather than white.
-// Fernverkehr's bright yellow is the one background white cannot be read on, so
-// it gets a measured contrast colour instead.
-const blackTextLines = new Set(["U4"]);
-
-function getLineTextColor(line: Departure["line"]): string {
-  if (line.product === "express") {
-    return getReadableTextColor(getLineColor(line));
-  }
-  return blackTextLines.has(line.name) ? BLACK : WHITE;
-}
-
-function getProductTextColor(product: string): string {
-  return product === "express" ? getReadableTextColor(getColorForProduct(product)) : WHITE;
-}
 
 function getOccupancy(dep: Departure) {
   const occ = dep.remarks?.find((r) => r.code?.startsWith("text.occup.loc.max"));
