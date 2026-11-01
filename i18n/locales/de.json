@@ -4,11 +4,16 @@
     "switchToDarkMode": "Zum dunklen Modus wechseln",
     "language": "Sprache"
   },
+  "nav": {
+    "departures": "Abfahrten",
+    "connections": "Verbindungen"
+  },
   "common": {
     "refresh": "Aktualisieren",
     "cancel": "Abbrechen",
     "apply": "Übernehmen",
-    "now": "Jetzt"
+    "now": "Jetzt",
+    "nextUpdateIn": "Nächste Aktualisierung in {count}s"
   },
   "search": {
     "label": "Station suchen",
@@ -20,7 +25,6 @@
     "backToSearch": "Zurück zur Stationssuche",
     "title": "{count} Abfahrt von {stop} | {count} Abfahrten von {stop}",
     "showingDeparturesFor": "Abfahrten für {datetime}",
-    "nextUpdateIn": "Nächste Aktualisierung in {count}s",
     "noDepartures": "Keine Abfahrten gefunden. Du kannst es später erneut versuchen.",
     "loadError": "Stationen konnten nicht geladen werden. Bitte später erneut versuchen.",
     "timeNotAvailable": "Keine Zeit verfügbar",
@@ -37,5 +41,40 @@
       "days": "{count} T",
       "ago": "vor {duration}"
     }
+  },
+  "routing": {
+    "start": "Von",
+    "destination": "Nach",
+    "via": "Zwischenhalt",
+    "addVia": "Zwischenhalt hinzufügen",
+    "removeVia": "Zwischenhalt entfernen",
+    "viaStation": "über {station}",
+    "viaMore": "über {station} +{count} weitere",
+    "startPlaceholder": "Startstation eingeben",
+    "destinationPlaceholder": "Zielstation eingeben",
+    "swap": "Start und Ziel tauschen",
+    "prompt": "Wähle Start und Ziel aus, um Verbindungen zu sehen.",
+    "sameStation": "Start und Ziel müssen unterschiedliche Stationen sein.",
+    "title": "{count} Verbindung von {from} nach {to} | {count} Verbindungen von {from} nach {to}",
+    "showingConnectionsFor": "Verbindungen für {datetime}",
+    "resultsTitle": "Verbindungen von {from} nach {to}",
+    "noJourneys": "Keine Verbindungen gefunden. Versuche ein anderes Start- oder Ziel.",
+    "loadError": "Verbindungen konnten nicht geladen werden. Bitte später erneut versuchen.",
+    "direct": "Direkt",
+    "transfers": "{count} Umstieg | {count} Umstiege",
+    "minutes": "{count} Min.",
+    "hours": "{hours} Std.",
+    "hoursMinutes": "{hours} Std. {minutes} Min.",
+    "walk": "Fußweg {duration}",
+    "walkShort": "Fußweg",
+    "walkDistance": "Fußweg {distance}",
+    "transfer": "Umstieg",
+    "wait": "Wartezeit {duration}",
+    "platform": "Gl. {platform}",
+    "departure": "Abfahrt",
+    "arrival": "Ankunft",
+    "delay": "+{minutes} Min.",
+    "showDetails": "Verbindungsdetails anzeigen",
+    "hideDetails": "Verbindungsdetails ausblenden"
   }
 }

@@ -1,5 +1,6 @@
 <template>
   <v-container>
+    <ViewTabs />
     <StationSearch @station-selected="handleStationSelected" />
   </v-container>
 </template>

@@ -4,11 +4,16 @@
     "switchToDarkMode": "Switch to dark mode",
     "language": "Language"
   },
+  "nav": {
+    "departures": "Departures",
+    "connections": "Connections"
+  },
   "common": {
     "refresh": "Refresh",
     "cancel": "Cancel",
     "apply": "Apply",
-    "now": "Now"
+    "now": "Now",
+    "nextUpdateIn": "Next update in {count}s"
   },
   "search": {
     "label": "Search station",
@@ -20,7 +25,6 @@
     "backToSearch": "Go back to stations search",
     "title": "{count} departure from {stop} | {count} departures from {stop}",
     "showingDeparturesFor": "Showing departures for {datetime}",
-    "nextUpdateIn": "Next update in {count}s",
     "noDepartures": "No departures found. You can try again later.",
     "loadError": "Failed to load stations. Please try again later.",
     "timeNotAvailable": "Time not available",
@@ -37,5 +41,40 @@
       "days": "{count} d",
       "ago": "{duration} ago"
     }
+  },
+  "routing": {
+    "start": "From",
+    "destination": "To",
+    "via": "Via",
+    "addVia": "Add stopover",
+    "removeVia": "Remove stopover",
+    "viaStation": "via {station}",
+    "viaMore": "via {station} +{count} more",
+    "startPlaceholder": "Enter start station",
+    "destinationPlaceholder": "Enter destination station",
+    "swap": "Swap start and destination",
+    "prompt": "Select a start and a destination to see connections.",
+    "sameStation": "Start and destination must be different stations.",
+    "title": "{count} connection from {from} to {to} | {count} connections from {from} to {to}",
+    "showingConnectionsFor": "Showing connections for {datetime}",
+    "resultsTitle": "Connections from {from} to {to}",
+    "noJourneys": "No connections found. Try another start or destination.",
+    "loadError": "Failed to load connections. Please try again later.",
+    "direct": "Direct",
+    "transfers": "{count} transfer | {count} transfers",
+    "minutes": "{count} min",
+    "hours": "{hours} h",
+    "hoursMinutes": "{hours} h {minutes} min",
+    "walk": "Walk {duration}",
+    "walkShort": "Walk",
+    "walkDistance": "Walk {distance}",
+    "transfer": "Transfer",
+    "wait": "Wait {duration}",
+    "platform": "Pl. {platform}",
+    "departure": "Departure",
+    "arrival": "Arrival",
+    "delay": "+{minutes} min",
+    "showDetails": "Show journey details",
+    "hideDetails": "Hide journey details"
   }
 }
