@@ -237,9 +237,6 @@
       class="text-body-1 text-medium-emphasis mt-4">
       {{ t("routing.noJourneys") }}
     </p>
-    <p v-else-if="!startStation || !destinationStation" class="text-body-1 text-medium-emphasis mt-4">
-      {{ t("routing.prompt") }}
-    </p>
 
     <template #fallback>
       <v-skeleton-loader type="chip, text"></v-skeleton-loader>
