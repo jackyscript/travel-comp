@@ -1,11 +1,12 @@
 <template>
   <ClientOnly fallback-tag="div">
     <div class="d-flex flex-column ga-3">
-      <v-autocomplete v-model="startStation" v-model:search="startQuery" :label="t('routing.start')"
-        :items="startStations" item-title="name" item-value="id" return-object no-filter auto-select-first="exact"
-        clearable :no-data-text="t('search.noResults')"
-        :hide-no-data="!startQuery || startSearchStatus !== 'success' || startQuery !== debouncedStartQuery"
-        :loading="startSearchStatus === 'pending' && !!startQuery" @click:clear="onStartStationClear">
+      <v-autocomplete ref="startAutocomplete" v-model="startStation" :search="startQuery"
+        :label="t('routing.start')" :items="startStations" item-title="name" item-value="id" return-object
+        no-filter auto-select-first="exact" clearable :no-data-text="t('search.noResults')"
+        :hide-no-data="!startSearchTerm || startSearchStatus !== 'success' || startSearchTerm !== debouncedStartQuery"
+        :loading="startSearchStatus === 'pending' && !!startSearchTerm" @click:clear="onStartStationClear"
+        @update:search="onStartSearchUpdate">
         <template #item="{ props: itemProps, item }">
           <v-list-item v-bind="itemProps">
             <template #append>
@@ -20,15 +21,17 @@
 
       <v-alert v-if="startSearchStatus === 'error'" type="error">
         {{ t("search.loadError") }}
-        <v-btn :active="false" @click="refresh" variant="text" prepend-icon="mdi-refresh" color="on-surface">{{
-          t("common.refresh") }}</v-btn>
+        <v-btn :active="false" @click="refreshStartStations" variant="text" prepend-icon="mdi-refresh"
+          color="on-surface">{{ t("common.refresh") }}</v-btn>
       </v-alert>
 
       <template v-if="showVia">
-        <v-autocomplete v-model="viaStation" v-model:search="viaQuery" :label="t('routing.via')" :items="viaStations"
-          item-title="name" item-value="id" return-object no-filter auto-select-first="exact" clearable
-          :no-data-text="t('search.noResults')" :hide-no-data="!viaQuery || viaSearchStatus !== 'success' || viaQuery !== debouncedViaQuery"
-          :loading="viaSearchStatus === 'pending' && !!viaQuery" @click:clear="onViaStationClear">
+        <v-autocomplete ref="viaAutocomplete" v-model="viaStation" :search="viaQuery" :label="t('routing.via')"
+          :items="viaStations" item-title="name" item-value="id" return-object no-filter auto-select-first="exact"
+          clearable :no-data-text="t('search.noResults')"
+          :hide-no-data="!viaSearchTerm || viaSearchStatus !== 'success' || viaSearchTerm !== debouncedViaQuery"
+          :loading="viaSearchStatus === 'pending' && !!viaSearchTerm" @click:clear="onViaStationClear"
+          @update:search="onViaSearchUpdate">
           <template #item="{ props: itemProps, item }">
             <v-list-item v-bind="itemProps">
               <template #append>
@@ -46,19 +49,20 @@
 
         <v-alert v-if="viaSearchStatus === 'error'" type="error">
           {{ t("search.loadError") }}
-          <v-btn :active="false" @click="refreshVia" variant="text" prepend-icon="mdi-refresh" color="on-surface">{{
-            t("common.refresh") }}</v-btn>
+          <v-btn :active="false" @click="refreshViaStations" variant="text" prepend-icon="mdi-refresh"
+            color="on-surface">{{ t("common.refresh") }}</v-btn>
         </v-alert>
       </template>
       <v-btn v-else variant="text" size="small" prepend-icon="mdi-plus" @click="showVia = true">
         {{ t("routing.addVia") }}
       </v-btn>
 
-      <v-autocomplete v-model="destinationStation" v-model:search="destinationQuery" :label="t('routing.destination')"
-        :items="destinationStations" item-title="name" item-value="id" return-object no-filter auto-select-first="exact"
-        clearable :no-data-text="t('search.noResults')"
-        :hide-no-data="!destinationQuery || destinationSearchStatus !== 'success' || destinationQuery !== debouncedDestinationQuery"
-        :loading="destinationSearchStatus === 'pending' && !!destinationQuery" @click:clear="onDestinationStationClear">
+      <v-autocomplete ref="destinationAutocomplete" v-model="destinationStation" :search="destinationQuery"
+        :label="t('routing.destination')" :items="destinationStations" item-title="name" item-value="id"
+        return-object no-filter auto-select-first="exact" clearable :no-data-text="t('search.noResults')"
+        :hide-no-data="!destinationSearchTerm || destinationSearchStatus !== 'success' || destinationSearchTerm !== debouncedDestinationQuery"
+        :loading="destinationSearchStatus === 'pending' && !!destinationSearchTerm"
+        @click:clear="onDestinationStationClear" @update:search="onDestinationSearchUpdate">
         <template #item="{ props: itemProps, item }">
           <v-list-item v-bind="itemProps">
             <template #append>
@@ -73,7 +77,7 @@
 
       <v-alert v-if="destinationSearchStatus === 'error'" type="error">
         {{ t("search.loadError") }}
-        <v-btn :active="false" @click="refreshDestination" variant="text" prepend-icon="mdi-refresh"
+        <v-btn :active="false" @click="refreshDestinationStations" variant="text" prepend-icon="mdi-refresh"
           color="on-surface">{{ t("common.refresh") }}</v-btn>
       </v-alert>
 
@@ -89,7 +93,7 @@
       </template>
       <v-alert v-else-if="journeyStatus === 'error'" type="error">
         {{ t("routing.loadError") }}
-        <v-btn :active="false" @click="refreshJourney" variant="text" prepend-icon="mdi-refresh"
+        <v-btn :active="false" @click="refreshJourney()" variant="text" prepend-icon="mdi-refresh"
           color="on-surface">{{ t("common.refresh") }}</v-btn>
       </v-alert>
       <template v-else-if="journeys?.journeys?.length">
@@ -474,10 +478,65 @@ useHead({
 const startQuery = ref("");
 const viaQuery = ref("");
 const destinationQuery = ref("");
+const startAutocomplete = ref<any>(null);
+const viaAutocomplete = ref<any>(null);
+const destinationAutocomplete = ref<any>(null);
 const debounceTime = 1000;
-const debouncedStartQuery = refDebounced(startQuery, debounceTime);
-const debouncedViaQuery = refDebounced(viaQuery, debounceTime);
-const debouncedDestinationQuery = refDebounced(destinationQuery, debounceTime);
+
+// Vuetify's autocomplete writes the selected item's title into its search
+// model on select and when the field loses focus. That text is not a user
+// query, so it must not trigger another locations request (which could time
+// out and wipe the selection).
+function stationSearchTerm(query: string, station: any): string {
+  const value = query.trim();
+  if (!value || value === station?.name) return "";
+  return value;
+}
+
+const startSearchTerm = computed(() =>
+  stationSearchTerm(startQuery.value, startStation.value),
+);
+const viaSearchTerm = computed(() =>
+  stationSearchTerm(viaQuery.value, viaStation.value),
+);
+const destinationSearchTerm = computed(() =>
+  stationSearchTerm(destinationQuery.value, destinationStation.value),
+);
+
+const debouncedStartQuery = refDebounced(startSearchTerm, debounceTime);
+const debouncedViaQuery = refDebounced(viaSearchTerm, debounceTime);
+const debouncedDestinationQuery = refDebounced(destinationSearchTerm, debounceTime);
+
+// Show the selected station in its autocomplete. We control `search` manually
+// (instead of using `v-model:search`) so Vuetify's programmatic resets on blur
+// cannot clear the query, e.g. when the refresh button in the error banner is
+// clicked.
+watch(startStation, (station) => {
+  startQuery.value = station?.name ?? "";
+});
+
+watch(viaStation, (station) => {
+  viaQuery.value = station?.name ?? "";
+});
+
+watch(destinationStation, (station) => {
+  destinationQuery.value = station?.name ?? "";
+});
+
+function onStartSearchUpdate(value: string) {
+  if (!startAutocomplete.value?.isFocused) return;
+  startQuery.value = value;
+}
+
+function onViaSearchUpdate(value: string) {
+  if (!viaAutocomplete.value?.isFocused) return;
+  viaQuery.value = value;
+}
+
+function onDestinationSearchUpdate(value: string) {
+  if (!destinationAutocomplete.value?.isFocused) return;
+  destinationQuery.value = value;
+}
 
 const {
   data: startStations,
@@ -551,12 +610,30 @@ const {
   },
 );
 
+function refreshStartStations() {
+  refresh();
+  // Keep the search field focused so the refreshed results open in the menu.
+  startAutocomplete.value?.focus();
+}
+
+function refreshViaStations() {
+  refreshVia();
+  viaAutocomplete.value?.focus();
+}
+
+function refreshDestinationStations() {
+  refreshDestination();
+  destinationAutocomplete.value?.focus();
+}
+
 function onStartStationClear() {
+  startStation.value = null;
   startQuery.value = "";
   startStations.value = [];
 }
 
 function onViaStationClear() {
+  viaStation.value = null;
   viaQuery.value = "";
   viaStations.value = [];
 }
@@ -568,6 +645,7 @@ function onRemoveVia() {
 }
 
 function onDestinationStationClear() {
+  destinationStation.value = null;
   destinationQuery.value = "";
   destinationStations.value = [];
 }
