@@ -5,8 +5,8 @@
         :label="t('routing.start')" :items="startStations" item-title="name" item-value="id" return-object
         no-filter auto-select-first="exact" clearable :no-data-text="t('search.noResults')"
         :hide-no-data="!startSearchTerm || startSearchStatus !== 'success' || startSearchTerm !== debouncedStartQuery"
-        :loading="startSearchStatus === 'pending' && !!startSearchTerm" @click:clear="onStartStationClear"
-        @update:search="onStartSearchUpdate">
+        :loading="startSearchStatus === 'pending' && !!startSearchTerm ? 'secondary' : false" @click:clear="onStartStationClear"
+        @update:search="onStartSearchUpdate" @update:focused="onStartFocus">
         <template #item="{ props: itemProps, item }">
           <v-list-item v-bind="itemProps">
             <template #append>
@@ -30,8 +30,8 @@
           :items="viaStations" item-title="name" item-value="id" return-object no-filter auto-select-first="exact"
           clearable :no-data-text="t('search.noResults')"
           :hide-no-data="!viaSearchTerm || viaSearchStatus !== 'success' || viaSearchTerm !== debouncedViaQuery"
-          :loading="viaSearchStatus === 'pending' && !!viaSearchTerm" @click:clear="onViaStationClear"
-          @update:search="onViaSearchUpdate">
+          :loading="viaSearchStatus === 'pending' && !!viaSearchTerm ? 'secondary' : false" @click:clear="onViaStationClear"
+          @update:search="onViaSearchUpdate" @update:focused="onViaFocus">
           <template #item="{ props: itemProps, item }">
             <v-list-item v-bind="itemProps">
               <template #append>
@@ -61,8 +61,9 @@
         :label="t('routing.destination')" :items="destinationStations" item-title="name" item-value="id"
         return-object no-filter auto-select-first="exact" clearable :no-data-text="t('search.noResults')"
         :hide-no-data="!destinationSearchTerm || destinationSearchStatus !== 'success' || destinationSearchTerm !== debouncedDestinationQuery"
-        :loading="destinationSearchStatus === 'pending' && !!destinationSearchTerm"
-        @click:clear="onDestinationStationClear" @update:search="onDestinationSearchUpdate">
+        :loading="destinationSearchStatus === 'pending' && !!destinationSearchTerm ? 'secondary' : false"
+        @click:clear="onDestinationStationClear" @update:search="onDestinationSearchUpdate"
+        @update:focused="onDestinationFocus">
         <template #item="{ props: itemProps, item }">
           <v-list-item v-bind="itemProps">
             <template #append>
@@ -251,7 +252,7 @@
 </template>
 
 <script setup lang="ts">
-import { refDebounced } from "@vueuse/core";
+import { useDebounceFn } from "@vueuse/core";
 import type { Journey, Journeys, Leg } from "~/utils/types";
 import { toHHMM, toISOLocal } from "~/utils/time";
 
@@ -503,9 +504,23 @@ const destinationSearchTerm = computed(() =>
   stationSearchTerm(destinationQuery.value, destinationStation.value),
 );
 
-const debouncedStartQuery = refDebounced(startSearchTerm, debounceTime);
-const debouncedViaQuery = refDebounced(viaSearchTerm, debounceTime);
-const debouncedDestinationQuery = refDebounced(destinationSearchTerm, debounceTime);
+const debouncedStartQuery = ref("");
+const debouncedViaQuery = ref("");
+const debouncedDestinationQuery = ref("");
+
+const scheduleStartQuery = useDebounceFn((value: string) => {
+  debouncedStartQuery.value = value;
+}, debounceTime);
+const scheduleViaQuery = useDebounceFn((value: string) => {
+  debouncedViaQuery.value = value;
+}, debounceTime);
+const scheduleDestinationQuery = useDebounceFn((value: string) => {
+  debouncedDestinationQuery.value = value;
+}, debounceTime);
+
+watch(startSearchTerm, scheduleStartQuery, { immediate: true });
+watch(viaSearchTerm, scheduleViaQuery, { immediate: true });
+watch(destinationSearchTerm, scheduleDestinationQuery, { immediate: true });
 
 // Show the selected station in its autocomplete. We control `search` manually
 // (instead of using `v-model:search`) so Vuetify's programmatic resets on blur
@@ -536,6 +551,23 @@ function onViaSearchUpdate(value: string) {
 function onDestinationSearchUpdate(value: string) {
   if (!destinationAutocomplete.value?.isFocused) return;
   destinationQuery.value = value;
+}
+
+// Leaving the field should not fire a search that was only scheduled while
+// typing. Re-entering it reschedules so the current text can still search.
+function onStartFocus(focused: boolean) {
+  if (focused) scheduleStartQuery(startSearchTerm.value);
+  else scheduleStartQuery.cancel();
+}
+
+function onViaFocus(focused: boolean) {
+  if (focused) scheduleViaQuery(viaSearchTerm.value);
+  else scheduleViaQuery.cancel();
+}
+
+function onDestinationFocus(focused: boolean) {
+  if (focused) scheduleDestinationQuery(destinationSearchTerm.value);
+  else scheduleDestinationQuery.cancel();
 }
 
 const {

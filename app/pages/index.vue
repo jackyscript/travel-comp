@@ -1,8 +1,8 @@
 <template>
-  <v-container>
-    <ViewTabs />
+  <div>
+    <ViewToggle />
     <StationSearch @station-selected="handleStationSelected" />
-  </v-container>
+  </div>
 </template>
 
 <script setup lang="ts">

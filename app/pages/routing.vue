@@ -1,6 +1,6 @@
 <template>
   <div>
-    <ViewTabs />
+    <ViewToggle />
     <RoutingSection />
   </div>
 </template>
