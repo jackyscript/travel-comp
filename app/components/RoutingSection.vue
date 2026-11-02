@@ -1,33 +1,11 @@
 <template>
   <ClientOnly fallback-tag="div">
-    <v-autocomplete v-model="startStation" v-model:search="startQuery" :label="t('routing.start')"
-      :items="startStations" item-title="name" item-value="id" return-object no-filter auto-select-first="exact"
-      clearable :no-data-text="t('search.noResults')"
-      :hide-no-data="!startQuery || startSearchStatus !== 'success' || startQuery !== debouncedStartQuery"
-      :loading="startSearchStatus === 'pending' && !!startQuery" @click:clear="onStartStationClear">
-      <template #item="{ props: itemProps, item }">
-        <v-list-item v-bind="itemProps">
-          <template #append>
-            <div class="d-inline-flex ga-1">
-              <v-img v-for="product in stationProducts(item)" :key="product" :src="getIconForProduct(product)"
-                width="24px"></v-img>
-            </div>
-          </template>
-        </v-list-item>
-      </template>
-    </v-autocomplete>
-
-    <v-alert v-if="startSearchStatus === 'error'" type="error" class="mt-2">
-      {{ t("search.loadError") }}
-      <v-btn :active="false" @click="refresh" variant="text" prepend-icon="mdi-refresh" color="on-surface">{{
-        t("common.refresh") }}</v-btn>
-    </v-alert>
-
-    <template v-if="showVia">
-      <v-autocomplete v-model="viaStation" v-model:search="viaQuery" :label="t('routing.via')" :items="viaStations"
-        item-title="name" item-value="id" return-object no-filter auto-select-first="exact" clearable
-        :no-data-text="t('search.noResults')" :hide-no-data="!viaQuery || viaSearchStatus !== 'success' || viaQuery !== debouncedViaQuery"
-        :loading="viaSearchStatus === 'pending' && !!viaQuery" @click:clear="onViaStationClear">
+    <div class="d-flex flex-column ga-3">
+      <v-autocomplete v-model="startStation" v-model:search="startQuery" :label="t('routing.start')"
+        :items="startStations" item-title="name" item-value="id" return-object no-filter auto-select-first="exact"
+        clearable :no-data-text="t('search.noResults')"
+        :hide-no-data="!startQuery || startSearchStatus !== 'success' || startQuery !== debouncedStartQuery"
+        :loading="startSearchStatus === 'pending' && !!startQuery" @click:clear="onStartStationClear">
         <template #item="{ props: itemProps, item }">
           <v-list-item v-bind="itemProps">
             <template #append>
@@ -38,209 +16,233 @@
             </template>
           </v-list-item>
         </template>
-        <template #append>
-          <v-btn icon="mdi-close" variant="text" :title="t('routing.removeVia')" @click="onRemoveVia"></v-btn>
+      </v-autocomplete>
+
+      <v-alert v-if="startSearchStatus === 'error'" type="error">
+        {{ t("search.loadError") }}
+        <v-btn :active="false" @click="refresh" variant="text" prepend-icon="mdi-refresh" color="on-surface">{{
+          t("common.refresh") }}</v-btn>
+      </v-alert>
+
+      <template v-if="showVia">
+        <v-autocomplete v-model="viaStation" v-model:search="viaQuery" :label="t('routing.via')" :items="viaStations"
+          item-title="name" item-value="id" return-object no-filter auto-select-first="exact" clearable
+          :no-data-text="t('search.noResults')" :hide-no-data="!viaQuery || viaSearchStatus !== 'success' || viaQuery !== debouncedViaQuery"
+          :loading="viaSearchStatus === 'pending' && !!viaQuery" @click:clear="onViaStationClear">
+          <template #item="{ props: itemProps, item }">
+            <v-list-item v-bind="itemProps">
+              <template #append>
+                <div class="d-inline-flex ga-1">
+                  <v-img v-for="product in stationProducts(item)" :key="product" :src="getIconForProduct(product)"
+                    width="24px"></v-img>
+                </div>
+              </template>
+            </v-list-item>
+          </template>
+          <template #append>
+            <v-btn icon="mdi-close" variant="text" :title="t('routing.removeVia')" @click="onRemoveVia"></v-btn>
+          </template>
+        </v-autocomplete>
+
+        <v-alert v-if="viaSearchStatus === 'error'" type="error">
+          {{ t("search.loadError") }}
+          <v-btn :active="false" @click="refreshVia" variant="text" prepend-icon="mdi-refresh" color="on-surface">{{
+            t("common.refresh") }}</v-btn>
+        </v-alert>
+      </template>
+      <v-btn v-else variant="text" size="small" prepend-icon="mdi-plus" @click="showVia = true">
+        {{ t("routing.addVia") }}
+      </v-btn>
+
+      <v-autocomplete v-model="destinationStation" v-model:search="destinationQuery" :label="t('routing.destination')"
+        :items="destinationStations" item-title="name" item-value="id" return-object no-filter auto-select-first="exact"
+        clearable :no-data-text="t('search.noResults')"
+        :hide-no-data="!destinationQuery || destinationSearchStatus !== 'success' || destinationQuery !== debouncedDestinationQuery"
+        :loading="destinationSearchStatus === 'pending' && !!destinationQuery" @click:clear="onDestinationStationClear">
+        <template #item="{ props: itemProps, item }">
+          <v-list-item v-bind="itemProps">
+            <template #append>
+              <div class="d-inline-flex ga-1">
+                <v-img v-for="product in stationProducts(item)" :key="product" :src="getIconForProduct(product)"
+                  width="24px"></v-img>
+              </div>
+            </template>
+          </v-list-item>
         </template>
       </v-autocomplete>
 
-      <v-alert v-if="viaSearchStatus === 'error'" type="error" class="mt-2">
+      <v-alert v-if="destinationSearchStatus === 'error'" type="error">
         {{ t("search.loadError") }}
-        <v-btn :active="false" @click="refreshVia" variant="text" prepend-icon="mdi-refresh" color="on-surface">{{
-          t("common.refresh") }}</v-btn>
+        <v-btn :active="false" @click="refreshDestination" variant="text" prepend-icon="mdi-refresh"
+          color="on-surface">{{ t("common.refresh") }}</v-btn>
       </v-alert>
-    </template>
-    <v-btn v-else variant="text" size="small" prepend-icon="mdi-plus" class="mt-1 mb-3" @click="showVia = true">
-      {{ t("routing.addVia") }}
-    </v-btn>
 
-    <v-autocomplete v-model="destinationStation" v-model:search="destinationQuery" :label="t('routing.destination')"
-      :items="destinationStations" item-title="name" item-value="id" return-object no-filter auto-select-first="exact"
-      clearable :no-data-text="t('search.noResults')"
-      :hide-no-data="!destinationQuery || destinationSearchStatus !== 'success' || destinationQuery !== debouncedDestinationQuery"
-      :loading="destinationSearchStatus === 'pending' && !!destinationQuery" @click:clear="onDestinationStationClear">
-      <template #item="{ props: itemProps, item }">
-        <v-list-item v-bind="itemProps">
-          <template #append>
-            <div class="d-inline-flex ga-1">
-              <v-img v-for="product in stationProducts(item)" :key="product" :src="getIconForProduct(product)"
-                width="24px"></v-img>
-            </div>
-          </template>
-        </v-list-item>
+      <v-alert v-if="sameStation" type="warning">
+        {{ t("routing.sameStation") }}
+      </v-alert>
+
+      <TimeControl v-if="startStation && destinationStation && !sameStation" v-model="customTravelTime"
+        :custom-label="customTimeLabel" :auto-refresh="false" />
+
+      <template v-if="journeyStatus === 'pending' && startStation && destinationStation && !sameStation">
+        <v-skeleton-loader type="card@3"></v-skeleton-loader>
       </template>
-    </v-autocomplete>
+      <v-alert v-else-if="journeyStatus === 'error'" type="error">
+        {{ t("routing.loadError") }}
+        <v-btn :active="false" @click="refreshJourney" variant="text" prepend-icon="mdi-refresh"
+          color="on-surface">{{ t("common.refresh") }}</v-btn>
+      </v-alert>
+      <template v-else-if="journeys?.journeys?.length">
+        <h2 class="text-h5 mb-4">
+          {{
+            t("routing.title", {
+              count: journeys.journeys.length,
+              from: startStation?.name,
+              to: destinationStation?.name,
+            })
+          }}
+        </h2>
+        <v-card v-for="(journey, journeyIndex) in journeys.journeys" :key="journeyIndex" class="mb-3" elevation="2"
+          role="button" tabindex="0" :aria-expanded="isJourneyExpanded(journeyIndex)" style="cursor: pointer"
+          @click="toggleJourney(journeyIndex)" @keydown.enter.prevent="toggleJourney(journeyIndex)"
+          @keydown.space.prevent="toggleJourney(journeyIndex)">
+          <div class="pa-3">
+            <div class="d-flex align-center flex-wrap ga-2">
+              <span class="text-h6">{{ formatJourneyTime(journeyStart(journey)) }}</span>
+              <v-icon size="small">mdi-arrow-right</v-icon>
+              <span class="text-h6">{{ formatJourneyTime(journeyEnd(journey)) }}</span>
+              <v-chip v-if="journeyDuration(journey)" density="comfortable" size="small" label variant="flat"
+                prepend-icon="mdi-clock-outline">
+                {{ journeyDuration(journey) }}
+              </v-chip>
+              <v-chip v-if="transferCount(journey) === 0" density="comfortable" size="small" label variant="flat"
+                color="success">
+                {{ t("routing.direct") }}
+              </v-chip>
+              <v-chip v-else density="comfortable" size="small" label variant="flat">
+                {{ t("routing.transfers", { count: transferCount(journey) }) }}
+              </v-chip>
+              <v-chip v-if="journeyDelay(journey) > 0" density="comfortable" size="small" label variant="flat"
+                :color="journeyDelay(journey) > 300 ? 'error' : 'warning'" prepend-icon="mdi-clock-alert-outline">
+                {{ t("routing.delay", { minutes: Math.floor(journeyDelay(journey) / 60) }) }}
+              </v-chip>
+              <v-spacer />
+              <span class="text-body-2 text-medium-emphasis d-inline-flex align-center ga-1">
+                {{ isJourneyExpanded(journeyIndex) ? t("routing.hideDetails") : t("routing.showDetails") }}
+                <v-icon size="small">{{
+                  isJourneyExpanded(journeyIndex) ? "mdi-chevron-up" : "mdi-chevron-down"
+                }}</v-icon>
+              </span>
+            </div>
 
-    <v-alert v-if="destinationSearchStatus === 'error'" type="error" class="mt-2">
-      {{ t("search.loadError") }}
-      <v-btn :active="false" @click="refreshDestination" variant="text" prepend-icon="mdi-refresh"
-        color="on-surface">{{ t("common.refresh") }}</v-btn>
-    </v-alert>
-
-    <v-alert v-if="sameStation" type="warning" class="mt-2">
-      {{ t("routing.sameStation") }}
-    </v-alert>
-
-    <TimeControl v-if="startStation && destinationStation && !sameStation" v-model="customTravelTime"
-      :custom-label="customTimeLabel" :auto-refresh="false" />
-
-    <template v-if="journeyStatus === 'pending' && startStation && destinationStation && !sameStation">
-      <v-skeleton-loader type="card@3"></v-skeleton-loader>
-    </template>
-    <v-alert v-else-if="journeyStatus === 'error'" type="error" class="mt-2">
-      {{ t("routing.loadError") }}
-      <v-btn :active="false" @click="refreshJourney" variant="text" prepend-icon="mdi-refresh"
-        color="on-surface">{{ t("common.refresh") }}</v-btn>
-    </v-alert>
-    <template v-else-if="journeys?.journeys?.length">
-      <h2 class="text-h5 mb-4">
-        {{
-          t("routing.title", {
-            count: journeys.journeys.length,
-            from: startStation?.name,
-            to: destinationStation?.name,
-          })
-        }}
-      </h2>
-      <v-card v-for="(journey, journeyIndex) in journeys.journeys" :key="journeyIndex" class="mb-3" elevation="2"
-        role="button" tabindex="0" :aria-expanded="isJourneyExpanded(journeyIndex)" style="cursor: pointer"
-        @click="toggleJourney(journeyIndex)" @keydown.enter.prevent="toggleJourney(journeyIndex)"
-        @keydown.space.prevent="toggleJourney(journeyIndex)">
-        <div class="pa-3">
-          <div class="d-flex align-center flex-wrap ga-2">
-            <span class="text-h6">{{ formatJourneyTime(journeyStart(journey)) }}</span>
-            <v-icon size="small">mdi-arrow-right</v-icon>
-            <span class="text-h6">{{ formatJourneyTime(journeyEnd(journey)) }}</span>
-            <v-chip v-if="journeyDuration(journey)" density="comfortable" size="small" label variant="flat"
-              prepend-icon="mdi-clock-outline">
-              {{ journeyDuration(journey) }}
-            </v-chip>
-            <v-chip v-if="transferCount(journey) === 0" density="comfortable" size="small" label variant="flat"
-              color="success">
-              {{ t("routing.direct") }}
-            </v-chip>
-            <v-chip v-else density="comfortable" size="small" label variant="flat">
-              {{ t("routing.transfers", { count: transferCount(journey) }) }}
-            </v-chip>
-            <v-chip v-if="journeyDelay(journey) > 0" density="comfortable" size="small" label variant="flat"
-              :color="journeyDelay(journey) > 300 ? 'error' : 'warning'" prepend-icon="mdi-clock-alert-outline">
-              {{ t("routing.delay", { minutes: Math.floor(journeyDelay(journey) / 60) }) }}
-            </v-chip>
-            <v-spacer />
-            <span class="text-body-2 text-medium-emphasis d-inline-flex align-center ga-1">
-              {{ isJourneyExpanded(journeyIndex) ? t("routing.hideDetails") : t("routing.showDetails") }}
-              <v-icon size="small">{{
-                isJourneyExpanded(journeyIndex) ? "mdi-chevron-up" : "mdi-chevron-down"
-              }}</v-icon>
-            </span>
-          </div>
-
-          <div class="d-flex align-center flex-wrap ga-1 mt-2">
-            <template v-if="transitLegs(journey).length">
-              <template v-for="(leg, legIndex) in transitLegs(journey)" :key="legIndex">
-                <v-chip density="compact" size="small" label variant="flat" :color="getLineColor(leg.line)"
-                  :style="{ color: getLineTextColor(leg.line) }">
-                  <template #prepend>
-                    <v-img :src="getIconForProduct(leg.line.product)" width="16" height="16" class="mr-1"></v-img>
-                  </template>
-                  {{ leg.line.name }}
-                </v-chip>
-                <v-icon v-if="legIndex < transitLegs(journey).length - 1" size="x-small"
-                  class="text-medium-emphasis">
-                  mdi-chevron-right
-                </v-icon>
-              </template>
-            </template>
-            <v-chip v-else density="compact" size="small" label variant="flat" prepend-icon="mdi-walk">
-              {{ t("routing.walkShort") }}
-            </v-chip>
-
-            <span v-if="viaLabel(journey)" class="text-caption text-medium-emphasis ml-1">
-              {{ viaLabel(journey) }}
-            </span>
-          </div>
-        </div>
-
-        <v-expand-transition>
-          <div v-show="isJourneyExpanded(journeyIndex)">
-            <v-divider></v-divider>
-            <div class="pa-3">
-              <v-row v-for="(leg, index) in journey.legs" :key="index" align="center" density="compact">
-                <v-col cols="12" sm="8">
-                  <v-row v-if="!!leg.line" align="center" density="compact">
-                    <v-col cols="auto" class="mr-2">
-                      <v-img :src="getIconForProduct(leg?.line?.product)" width="40px" height="40px"></v-img>
-                    </v-col>
-                    <v-col>
-                      <div class="text-h6">
-                        <v-chip density="comfortable" size="small" class="mr-2" label variant="flat"
-                          :color="getLineColor(leg.line)" :style="{ color: getLineTextColor(leg.line) }">{{ leg.line.name
-                          }}</v-chip> {{ leg.direction }}
-                      </div>
-                      <div><v-icon class="mr-2">mdi-ray-start-arrow</v-icon><span>{{ leg?.origin?.name }}</span></div>
-                      <div><v-icon class="mr-2">mdi-ray-end</v-icon><span>{{ leg?.destination?.name }}</span></div>
-
-                      <div class="d-flex flex-column flex-md-row ga-1 mt-1 align-start">
-                        <v-chip density="comfortable" size="small" label variant="flat" color="info"
-                          v-if="!!leg.departurePlatform" class="text-body-2 text-medium-emphasis">
-                          <span v-if="!leg.departurePlatform.includes('Pos')">{{
-                            t("departures.platform", { platform: leg.departurePlatform })
-                          }}</span><span v-else>{{ leg.departurePlatform }}</span>
-                        </v-chip>
-                      </div>
-                    </v-col>
-                  </v-row>
-                  <v-row v-else align="center" density="compact">
-                    <v-col cols="auto" class="mr-2">
-                      <template v-if="leg.departure !== leg.arrival">
-                        <v-icon class="mr-2">mdi-walk</v-icon><v-chip density="comfortable" label variant="flat"
-                          class="text-body-2" color="yellow-lighten-1">
-                          {{ t("routing.walkShort") }} {{ leg.distance ? `${leg.distance} m` : '' }}
-                        </v-chip>
-                      </template>
-                      <template v-else>
-                        <v-icon class="mr-2">mdi-transit-transfer</v-icon><v-chip density="comfortable" label
-                          variant="flat" class="text-body-2" color="yellow-lighten-1">
-                          {{ t("routing.transfer") }} {{ leg.distance ? `${leg.distance} m` : '' }}
-                        </v-chip>
-                      </template>
-                    </v-col>
-                  </v-row>
-                </v-col>
-                <v-col v-if="legHasTimeInfo(leg)" cols="12" sm="4"
-                  class="d-flex flex-wrap flex-sm-column align-center align-sm-end ga-1">
-                  <template v-if="leg.departure !== leg.arrival">
-                    <v-chip density="comfortable" size="small" label variant="flat" prepend-icon="mdi-ray-start-arrow"
-                      class="text-body-2">
-                      <span class="mr-1">{{ t("routing.departure") }}</span>
-                      {{ leg.departure ? (toHHMM(new Date(leg.departure))) : t("departures.timeNotAvailable") }}
-                    </v-chip>
-                    <v-chip density="comfortable" size="small" label variant="flat" prepend-icon="mdi-ray-end"
-                      class="text-body-2">
-                      <span class="mr-1">{{ t("routing.arrival") }}</span>
-                      {{ leg.arrival ? (toHHMM(new Date(leg.arrival))) : t("departures.timeNotAvailable") }}
-                    </v-chip>
-                  </template>
-                  <v-chip v-if="leg.departureDelay && leg.departureDelay > 0 && !!leg.line" density="comfortable"
-                    size="small" label variant="flat" :color="leg.departureDelay > 300 ? 'error' : 'warning'"
-                    prepend-icon="mdi-clock-alert-outline" class="text-body-2">
-                    {{ t("departures.delayLong", { minutes: Math.floor(leg.departureDelay / 60) }) }}
+            <div class="d-flex align-center flex-wrap ga-1 mt-2">
+              <template v-if="transitLegs(journey).length">
+                <template v-for="(leg, legIndex) in transitLegs(journey)" :key="legIndex">
+                  <v-chip density="compact" size="small" label variant="flat" :color="getLineColor(leg.line)"
+                    :style="{ color: getLineTextColor(leg.line) }">
+                    <template #prepend>
+                      <v-img :src="getIconForProduct(leg.line.product)" width="16" height="16" class="mr-1"></v-img>
+                    </template>
+                    {{ leg.line.name }}
                   </v-chip>
-                </v-col>
-                <v-divider v-if="index < journey.legs.length - 1"></v-divider>
-              </v-row>
+                  <v-icon v-if="legIndex < transitLegs(journey).length - 1" size="x-small"
+                    class="text-medium-emphasis">
+                    mdi-chevron-right
+                  </v-icon>
+                </template>
+              </template>
+              <v-chip v-else density="compact" size="small" label variant="flat" prepend-icon="mdi-walk">
+                {{ t("routing.walkShort") }}
+              </v-chip>
+
+              <span v-if="viaLabel(journey)" class="text-caption text-medium-emphasis ml-1">
+                {{ viaLabel(journey) }}
+              </span>
             </div>
           </div>
-        </v-expand-transition>
-      </v-card>
-    </template>
-    <p v-else-if="journeyStatus === 'success' && startStation && destinationStation && !sameStation"
-      class="text-body-1 text-medium-emphasis mt-4">
-      {{ t("routing.noJourneys") }}
-    </p>
 
-    <template #fallback>
-      <v-skeleton-loader type="chip, text"></v-skeleton-loader>
-    </template>
+          <v-expand-transition>
+            <div v-show="isJourneyExpanded(journeyIndex)">
+              <v-divider></v-divider>
+              <div class="pa-3">
+                <v-row v-for="(leg, index) in journey.legs" :key="index" align="center" density="compact">
+                  <v-col cols="12" sm="8">
+                    <v-row v-if="!!leg.line" align="center" density="compact">
+                      <v-col cols="auto" class="mr-2">
+                        <v-img :src="getIconForProduct(leg?.line?.product)" width="40px" height="40px"></v-img>
+                      </v-col>
+                      <v-col>
+                        <div class="text-h6">
+                          <v-chip density="comfortable" size="small" class="mr-2" label variant="flat"
+                            :color="getLineColor(leg.line)" :style="{ color: getLineTextColor(leg.line) }">{{ leg.line.name
+                            }}</v-chip> {{ leg.direction }}
+                        </div>
+                        <div><v-icon class="mr-2">mdi-ray-start-arrow</v-icon><span>{{ leg?.origin?.name }}</span></div>
+                        <div><v-icon class="mr-2">mdi-ray-end</v-icon><span>{{ leg?.destination?.name }}</span></div>
+
+                        <div class="d-flex flex-column flex-md-row ga-1 mt-1 align-start">
+                          <v-chip density="comfortable" size="small" label variant="flat" color="info"
+                            v-if="!!leg.departurePlatform" class="text-body-2 text-medium-emphasis">
+                            <span v-if="!leg.departurePlatform.includes('Pos')">{{
+                              t("departures.platform", { platform: leg.departurePlatform })
+                            }}</span><span v-else>{{ leg.departurePlatform }}</span>
+                          </v-chip>
+                        </div>
+                      </v-col>
+                    </v-row>
+                    <v-row v-else align="center" density="compact">
+                      <v-col cols="auto" class="mr-2">
+                        <template v-if="leg.departure !== leg.arrival">
+                          <v-icon class="mr-2">mdi-walk</v-icon><v-chip density="comfortable" label variant="flat"
+                            class="text-body-2" color="yellow-lighten-1">
+                            {{ t("routing.walkShort") }} {{ leg.distance ? `${leg.distance} m` : '' }}
+                          </v-chip>
+                        </template>
+                        <template v-else>
+                          <v-icon class="mr-2">mdi-transit-transfer</v-icon><v-chip density="comfortable" label
+                            variant="flat" class="text-body-2" color="yellow-lighten-1">
+                            {{ t("routing.transfer") }} {{ leg.distance ? `${leg.distance} m` : '' }}
+                          </v-chip>
+                        </template>
+                      </v-col>
+                    </v-row>
+                  </v-col>
+                  <v-col v-if="legHasTimeInfo(leg)" cols="12" sm="4"
+                    class="d-flex flex-wrap flex-sm-column align-center align-sm-end ga-1">
+                    <template v-if="leg.departure !== leg.arrival">
+                      <v-chip density="comfortable" size="small" label variant="flat" prepend-icon="mdi-ray-start-arrow"
+                        class="text-body-2">
+                        <span class="mr-1">{{ t("routing.departure") }}</span>
+                        {{ leg.departure ? (toHHMM(new Date(leg.departure))) : t("departures.timeNotAvailable") }}
+                      </v-chip>
+                      <v-chip density="comfortable" size="small" label variant="flat" prepend-icon="mdi-ray-end"
+                        class="text-body-2">
+                        <span class="mr-1">{{ t("routing.arrival") }}</span>
+                        {{ leg.arrival ? (toHHMM(new Date(leg.arrival))) : t("departures.timeNotAvailable") }}
+                      </v-chip>
+                    </template>
+                    <v-chip v-if="leg.departureDelay && leg.departureDelay > 0 && !!leg.line" density="comfortable"
+                      size="small" label variant="flat" :color="leg.departureDelay > 300 ? 'error' : 'warning'"
+                      prepend-icon="mdi-clock-alert-outline" class="text-body-2">
+                      {{ t("departures.delayLong", { minutes: Math.floor(leg.departureDelay / 60) }) }}
+                    </v-chip>
+                  </v-col>
+                  <v-divider v-if="index < journey.legs.length - 1"></v-divider>
+                </v-row>
+              </div>
+            </div>
+          </v-expand-transition>
+        </v-card>
+      </template>
+      <p v-else-if="journeyStatus === 'success' && startStation && destinationStation && !sameStation"
+        class="text-body-1 text-medium-emphasis mt-4">
+        {{ t("routing.noJourneys") }}
+      </p>
+
+      <template #fallback>
+        <v-skeleton-loader type="chip, text"></v-skeleton-loader>
+      </template>
+    </div>
   </ClientOnly>
 </template>
 
@@ -409,9 +411,6 @@ function updateQuery(updates: Record<string, string | null>) {
   if (changed) router.replace({ query });
 }
 
-// The URL is the source of truth for `from`, `via` and `to`. It lets users
-// bookmark/share a connection and keeps the form in sync with back/forward
-// navigation.
 let routeSyncToken = 0;
 
 watch(
