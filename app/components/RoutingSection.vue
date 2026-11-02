@@ -5,7 +5,8 @@
         :items="startStations" item-title="name" item-value="id" return-object no-filter auto-select-first="exact"
         clearable :no-data-text="t('search.noResults')"
         :hide-no-data="!startQuery || startSearchStatus !== 'success' || startQuery !== debouncedStartQuery"
-        :loading="startSearchStatus === 'pending' && !!startQuery" @click:clear="onStartStationClear">
+        :loading="startSearchStatus === 'pending' && !!startQuery" @click:clear="onStartStationClear"
+        @update:model-value="onStartStationSelect">
         <template #item="{ props: itemProps, item }">
           <v-list-item v-bind="itemProps">
             <template #append>
@@ -28,7 +29,8 @@
         <v-autocomplete v-model="viaStation" v-model:search="viaQuery" :label="t('routing.via')" :items="viaStations"
           item-title="name" item-value="id" return-object no-filter auto-select-first="exact" clearable
           :no-data-text="t('search.noResults')" :hide-no-data="!viaQuery || viaSearchStatus !== 'success' || viaQuery !== debouncedViaQuery"
-          :loading="viaSearchStatus === 'pending' && !!viaQuery" @click:clear="onViaStationClear">
+          :loading="viaSearchStatus === 'pending' && !!viaQuery" @click:clear="onViaStationClear"
+          @update:model-value="onViaStationSelect">
           <template #item="{ props: itemProps, item }">
             <v-list-item v-bind="itemProps">
               <template #append>
@@ -58,7 +60,8 @@
         :items="destinationStations" item-title="name" item-value="id" return-object no-filter auto-select-first="exact"
         clearable :no-data-text="t('search.noResults')"
         :hide-no-data="!destinationQuery || destinationSearchStatus !== 'success' || destinationQuery !== debouncedDestinationQuery"
-        :loading="destinationSearchStatus === 'pending' && !!destinationQuery" @click:clear="onDestinationStationClear">
+        :loading="destinationSearchStatus === 'pending' && !!destinationQuery" @click:clear="onDestinationStationClear"
+        @update:model-value="onDestinationStationSelect">
         <template #item="{ props: itemProps, item }">
           <v-list-item v-bind="itemProps">
             <template #append>
@@ -479,6 +482,18 @@ const debouncedStartQuery = refDebounced(startQuery, debounceTime);
 const debouncedViaQuery = refDebounced(viaQuery, debounceTime);
 const debouncedDestinationQuery = refDebounced(destinationQuery, debounceTime);
 
+watch(startStation, (station) => {
+  if (station) startQuery.value = "";
+});
+
+watch(viaStation, (station) => {
+  if (station) viaQuery.value = "";
+});
+
+watch(destinationStation, (station) => {
+  if (station) destinationQuery.value = "";
+});
+
 const {
   data: startStations,
   status: startSearchStatus,
@@ -551,12 +566,26 @@ const {
   },
 );
 
+function onStartStationSelect(value: any) {
+  if (value) startQuery.value = "";
+}
+
+function onViaStationSelect(value: any) {
+  if (value) viaQuery.value = "";
+}
+
+function onDestinationStationSelect(value: any) {
+  if (value) destinationQuery.value = "";
+}
+
 function onStartStationClear() {
+  startStation.value = null;
   startQuery.value = "";
   startStations.value = [];
 }
 
 function onViaStationClear() {
+  viaStation.value = null;
   viaQuery.value = "";
   viaStations.value = [];
 }
@@ -568,6 +597,7 @@ function onRemoveVia() {
 }
 
 function onDestinationStationClear() {
+  destinationStation.value = null;
   destinationQuery.value = "";
   destinationStations.value = [];
 }
