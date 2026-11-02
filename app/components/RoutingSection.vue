@@ -238,11 +238,11 @@
         class="text-body-1 text-medium-emphasis mt-4">
         {{ t("routing.noJourneys") }}
       </p>
-
-      <template #fallback>
-        <v-skeleton-loader type="chip, text"></v-skeleton-loader>
-      </template>
     </div>
+
+    <template #fallback>
+      <v-skeleton-loader type="chip, text"></v-skeleton-loader>
+    </template>
   </ClientOnly>
 </template>
 
