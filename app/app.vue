@@ -1,5 +1,5 @@
 <template>
-  <v-app>
+  <v-app :theme="theme.global.name.value">
     <NuxtRouteAnnouncer />
     <v-app-bar app>
       <v-btn to="/" icon class="ml-4" :active="false" color="secondary">
@@ -72,7 +72,13 @@ const currentLocaleName = computed(
 // URL under the `no_prefix` strategy, so hreflang alternates would be duplicates.
 useLocaleHead({ lang: true, dir: false, seo: false });
 
-theme.change(preferredDark.value ? "dark" : "light");
+watch(
+  preferredDark,
+  (isDark) => {
+    theme.change(isDark ? "dark" : "light");
+  },
+  { immediate: true },
+);
 
 function toggleTheme() {
   theme.change(theme.global.name.value === "dark" ? "light" : "dark");
