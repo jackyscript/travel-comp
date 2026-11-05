@@ -59,7 +59,6 @@
     "resultsTitle": "Connections from {from} to {to}",
     "noJourneys": "No connections found. Try another start or destination.",
     "loadError": "Failed to load connections. Please try again later.",
-    "direct": "Direct",
     "transfers": "{count} transfer | {count} transfers",
     "minutes": "{count} min",
     "hours": "{hours} h",
