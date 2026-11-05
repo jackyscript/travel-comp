@@ -59,7 +59,6 @@
     "resultsTitle": "Verbindungen von {from} nach {to}",
     "noJourneys": "Keine Verbindungen gefunden. Versuche ein anderes Start- oder Ziel.",
     "loadError": "Verbindungen konnten nicht geladen werden. Bitte später erneut versuchen.",
-    "direct": "Direkt",
     "transfers": "{count} Umstieg | {count} Umstiege",
     "minutes": "{count} Min.",
     "hours": "{hours} Std.",

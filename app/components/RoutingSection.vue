@@ -120,11 +120,7 @@
                 prepend-icon="mdi-clock-outline">
                 {{ journeyDuration(journey) }}
               </v-chip>
-              <v-chip v-if="transferCount(journey) === 0" density="comfortable" size="small" label variant="flat"
-                color="success">
-                {{ t("routing.direct") }}
-              </v-chip>
-              <v-chip v-else density="comfortable" size="small" label variant="flat">
+              <v-chip v-if="transferCount(journey) > 0" density="comfortable" size="small" label variant="flat">
                 {{ t("routing.transfers", { count: transferCount(journey) }) }}
               </v-chip>
               <v-chip v-if="journeyDelay(journey) > 0" density="comfortable" size="small" label variant="flat"
