@@ -21,7 +21,7 @@ const { data: stationData } = useAsyncData(
   async () => {
     if (!stationId.value) return null;
     try {
-      return await $fetch(`https://v6.vbb.transport.rest/stops/${stationId.value}`);
+      return await $fetch(`https://v6.vbb.transport.rest/stops/${stationId.value}?pretty=false`);
     } catch (e) {
       return null;
     }

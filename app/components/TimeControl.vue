@@ -65,13 +65,17 @@
 </template>
 
 <script setup lang="ts">
+import { useDocumentVisibility, useIntervalFn } from "@vueuse/core";
 import { toHHMM } from "~/utils/time";
 
 interface Props {
   modelValue: Date | null;
   /** Text to show instead of the current time when a custom time is selected. */
   customLabel?: string;
-  /** Re-emits `refresh` every 60 seconds while no custom time is selected. */
+  /**
+   * Re-emits `refresh` every 60 seconds while no custom time is selected and
+   * the page is visible. Paused in the background, refreshed on return.
+   */
   autoRefresh?: boolean;
 }
 
@@ -127,28 +131,62 @@ function resetToNow() {
   dialogVisible.value = false;
 }
 
-const countdown = ref(60);
-let countdownInterval: ReturnType<typeof setInterval> | null = null;
+const visibility = useDocumentVisibility();
+const refreshIntervalMs = 60_000;
+const countdown = ref(refreshIntervalMs / 1000);
+let lastRefreshAt = Date.now();
+
+const { pause: pauseCountdown, resume: resumeCountdown } = useIntervalFn(tick, 1000, {
+  immediate: false,
+});
 
 function stopCountdown() {
-  if (countdownInterval) {
-    clearInterval(countdownInterval);
-    countdownInterval = null;
-  }
+  pauseCountdown();
+}
+
+function secondsRemaining(): number {
+  const elapsed = Date.now() - lastRefreshAt;
+  return Math.max(0, Math.ceil((refreshIntervalMs - elapsed) / 1000));
 }
 
 function startCountdown() {
   stopCountdown();
-  countdown.value = 60;
-  countdownInterval = setInterval(() => {
-    currentTime.value = new Date();
-    countdown.value--;
-    if (countdown.value <= 0) {
-      emit("refresh");
-      startCountdown();
-    }
-  }, 1000);
+  lastRefreshAt = Date.now();
+  countdown.value = refreshIntervalMs / 1000;
+  // No ticking (or fetching) while the tab/app is in the background.
+  if (props.autoRefresh && !props.modelValue && visibility.value !== "hidden") {
+    resumeCountdown();
+  }
 }
+
+function tick() {
+  currentTime.value = new Date();
+  const remaining = secondsRemaining();
+  countdown.value = remaining;
+  if (remaining === 0) {
+    lastRefreshAt = Date.now();
+    countdown.value = refreshIntervalMs / 1000;
+    emit("refresh");
+  }
+}
+
+watch(visibility, (state) => {
+  if (state === "hidden") {
+    stopCountdown();
+    return;
+  }
+  currentTime.value = new Date();
+  if (!props.autoRefresh || props.modelValue) return;
+
+  // Background time must not count towards the refresh interval, but data
+  // older than 60s is stale as soon as the user comes back.
+  if (Date.now() - lastRefreshAt >= refreshIntervalMs) {
+    lastRefreshAt = Date.now();
+    emit("refresh");
+  }
+  countdown.value = Math.max(1, secondsRemaining());
+  resumeCountdown();
+});
 
 watch(
   () => props.modelValue,
@@ -168,6 +206,4 @@ onMounted(() => {
     startCountdown();
   }
 });
-
-onUnmounted(stopCountdown);
 </script>

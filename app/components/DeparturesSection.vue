@@ -305,7 +305,7 @@ const {
     if (!props.selectedStation) return { departures: [] };
     const when = effectiveWhen.value;
     const data = await $fetch<DeparturesResponse>(
-      `https://v6.vbb.transport.rest/stops/${props.selectedStation.id}/departures?results=20&duration=100&language=${locale.value}${when ? `&when=${encodeURIComponent(when)}` : ""}`,
+      `https://v6.vbb.transport.rest/stops/${props.selectedStation.id}/departures?results=20&duration=60&language=${locale.value}&pretty=false${when ? `&when=${encodeURIComponent(when)}` : ""}`,
     );
     return data;
   },

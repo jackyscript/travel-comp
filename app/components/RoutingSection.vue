@@ -307,7 +307,7 @@ function parseWhen(value: unknown): Date | null {
 async function loadStation(id: string | null) {
   if (!id) return null;
   try {
-    return await $fetch(`https://v6.vbb.transport.rest/stops/${id}`);
+    return await $fetch(`https://v6.vbb.transport.rest/stops/${id}?pretty=false`);
   } catch {
     return null;
   }
@@ -575,7 +575,7 @@ const {
   () => {
     if (debouncedStartQuery.value == null || !debouncedStartQuery.value.trim()) return [];
     return $fetch(
-      `https://v6.vbb.transport.rest/locations?poi=false&addresses=false&query=${encodeURIComponent(debouncedStartQuery.value)}`,
+      `https://v6.vbb.transport.rest/locations?poi=false&addresses=false&pretty=false&query=${encodeURIComponent(debouncedStartQuery.value)}`,
     );
   },
   { default: () => [], watch: [debouncedStartQuery], timeout: debounceTime + 10000 },
@@ -590,7 +590,7 @@ const {
   () => {
     if (debouncedViaQuery.value == null || !debouncedViaQuery.value.trim()) return [];
     return $fetch(
-      `https://v6.vbb.transport.rest/locations?poi=false&addresses=false&query=${encodeURIComponent(debouncedViaQuery.value)}`,
+      `https://v6.vbb.transport.rest/locations?poi=false&addresses=false&pretty=false&query=${encodeURIComponent(debouncedViaQuery.value)}`,
     );
   },
   { default: () => [], watch: [debouncedViaQuery], timeout: debounceTime + 10000 },
@@ -605,7 +605,7 @@ const {
   () => {
     if (debouncedDestinationQuery.value == null || !debouncedDestinationQuery.value.trim()) return [];
     return $fetch(
-      `https://v6.vbb.transport.rest/locations?poi=false&addresses=false&query=${encodeURIComponent(debouncedDestinationQuery.value)}`,
+      `https://v6.vbb.transport.rest/locations?poi=false&addresses=false&pretty=false&query=${encodeURIComponent(debouncedDestinationQuery.value)}`,
     );
   },
   { default: () => [], watch: [debouncedDestinationQuery], timeout: debounceTime + 10000 },
@@ -625,6 +625,7 @@ const {
     const params = new URLSearchParams({
       from: String(startStation.value.id),
       to: String(destinationStation.value.id),
+      pretty: "false",
     });
     if (viaStation.value?.id) params.set("via", String(viaStation.value.id));
     const when = effectiveWhen.value;

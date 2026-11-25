@@ -100,7 +100,7 @@ const {
   () => {
     if (debouncedQuery.value == null || !debouncedQuery.value.trim()) return [];
     return $fetch(
-      `https://v6.vbb.transport.rest/locations?poi=false&addresses=false&query=${encodeURIComponent(debouncedQuery.value)}`,
+      `https://v6.vbb.transport.rest/locations?poi=false&addresses=false&pretty=false&query=${encodeURIComponent(debouncedQuery.value)}`,
     );
   },
   { default: () => [], watch: [debouncedQuery], timeout: debounceTime + 10000 },
